@@ -55,51 +55,76 @@ requirejs([
 
   var score = 0;
   var statusElem = document.getElementById("gamestatus");
-  var inputElem = document.getElementById("inputarea");
-  var colorElem = document.getElementById("display");
+  var hand = document.getElementById("hand");
+  var handElements = [];
+  var handSize = 5;
   var client = new GameClient();
 
   CommonUI.setupStandardControllerUI(client, globals);
   CommonUI.askForNameOnce();   // ask for the user's name if not set
   CommonUI.showMenu(true);     // shows the gear menu
 
-  var randInt = function(range) {
-    return Math.floor(Math.random() * range);
-  };
-
-  // Sends a move command to the game.
-  //
-  // This will generate a 'move' event in the corresponding
-  // NetPlayer object in the game.
-  var sendMoveCmd = function(position, target) {
-    client.sendCmd('move', {
-      x: position.x / target.clientWidth,
-      y: position.y / target.clientHeight,
-    });
-  };
-
-  // Pick a random color
-  var color =  'rgb(' + randInt(256) + "," + randInt(256) + "," + randInt(256) + ")";
-  // Send the color to the game.
-  //
-  // This will generate a 'color' event in the corresponding
-  // NetPlayer object in the game.
-  client.sendCmd('color', {
-    color: color,
-  });
-  colorElem.style.backgroundColor = color;
-
-  // Send a message to the game when the screen is touched
-  inputElem.addEventListener('pointermove', function(event) {
-    var position = Input.getRelativeCoordinates(event.target, event);
-    sendMoveCmd(position, event.target);
-    event.preventDefault();
-  });
-
   // Update our score when the game tells us.
   client.addEventListener('scored', function(cmd) {
     score += cmd.points;
-    statusElem.innerHTML = "You scored: " + cmd.points + " total: " + score;
+    statusElem.innerHTML = "Score: " + score;
   });
-});
 
+  // Set hand
+  client.addEventListener('setHand', function(cmd) {
+      handElements = [];
+      hand.innerHTML = "";
+      for (var i=0; i<cmd.hand.length; ++i) {
+          handElements.push(new CardElement(cmd.hand[i]));
+      }
+  });
+
+  function Card(color, text) {
+      this.owner = undefined; //Player obj or undefined
+      this.text = text;
+      this.color = color; //"black" or "white"
+
+      this.setOwner = function(name) {
+          if (this.owner == name) {
+              return false;
+          } else {
+              this.owner = name;
+              return true;
+          }
+      }
+      this.remOwner = function() {
+          if (this.owner === undefined) {
+              return false;
+          } else {
+              var oldOwner = this.owner;
+              this.owner = undefined;
+              return oldOwner;
+          }
+      }
+  };
+
+  function CardElement(card) {
+      this.card = card;
+      var el = document.createElement("div");
+      el.className = card.color + " card";
+      el.innerHTML = card.text;
+      hand.appendChild(el);
+      this.el = el;
+
+      this.el.onclick = function(event) {
+          client.sendCmd('playCard', {
+            text: this.innerHTML
+          });
+      }
+
+      this.set = function(card) {
+          this.card = card;
+          this.el.innerHTML = card.text;
+          return this.el;
+      }
+
+      this.unset = function() {
+          this.el.innerHTML = this.card.owner;
+      }
+  }
+});

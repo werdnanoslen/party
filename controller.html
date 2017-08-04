@@ -26,11 +26,12 @@
 
 
     <div id="gamearea" class="fixheight">
-      <h1 id="gamestatus">status</h1>
+      <h1 id="gamestatus">Score: 0</h1>
       <div id="display" class="hft-fullcenter fixheight">
-        <div id="input" class="hft-instruction hft-fullcenter">Touch to Move</div>
+        <div id="input" class="hft-instruction hft-fullcenter">
+            <div id="hand"></div>
+        </div>
       </div>
-      <div id="inputarea"  class="hft-fullcenter fixheight"></div>
     </div>
 
 <!-- below this line is mostly simple-ui related html -->
@@ -79,5 +80,3 @@
 <script data-main="scripts/controller.js" src="node_modules/requirejs/require.js"></script>
 </body>
 </html>
-
-

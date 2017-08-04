@@ -53,108 +53,282 @@ requirejs([
   var PlayerNameManager = sampleUI.PlayerNameManager;
 
   var statusElem = document.getElementById("status");
-  var canvas = document.getElementById("playfield");
-  var ctx = canvas.getContext("2d");
+  var table = document.getElementById("table");
   var players = [];
+  var turn = -1;
+  var nextPlayer = undefined;
+  var handSize = 5;
+  var maxPlayers = 5;
+  var minPlayers = 2;
+  var whiteCards = [];
+  var blackCards = [];
+  var whiteDeck = undefined;
+  var blackDeck = undefined;
+  var playedWhiteCard = undefined;
+  var playedWhiteCardElement = new CardElement(new Card("white", ""));
+  var playedBlackCards = [];
+  var playedBlackCardsElements = [];
   var globals = {
     itemSize: 15,
   };
   Misc.applyUrlSettings(globals);
 
-  var pickRandomPosition = function() {
-    return {
-      x: 30 + Misc.randInt(canvas.width  - 60),
-      y: 30 + Misc.randInt(canvas.height - 60),
-    };
+  // load card contents
+  for (var i=0; i<100; ++i) {
+      var whiteCard = new Card("white", "card text #" + i);
+      whiteCards.push(whiteCard);
+
+      var blackCard = new Card("black", "card text #" + i);
+      blackCards.push(blackCard);
+  }
+  whiteDeck = new Deck(whiteCards);
+  blackDeck = new Deck(blackCards);
+  nextTurn();
+
+  function nextTurn() {
+      if (players.length < minPlayers) {
+          console.log("not enough players");
+          return;
+      }
+      for (var i=0; i<playedBlackCards.length; ++i) {
+          blackDeck.discard(playedBlackCards[i]);
+          playedBlackCardsElements[i].unset();
+      }
+      playedBlackCards = [];
+      whiteDeck.discard(playedWhiteCard);
+      playedWhiteCard = whiteDeck.draw();
+      playedWhiteCardElement.set(playedWhiteCard);
+      nextPlayer = players[((++turn) % players.length)];
+      nextPlayer.isTurn = true;
+      console.log("it's " + nextPlayer.name + "'s turn");
+      var placeCards = [];
+      for (var i=0; i<players.length; ++i) {
+          var player = players[i];
+          if (nextPlayer.name == player.name) {
+              player.canPlayCard = false;
+              player.placeCardElement.el.style.visibility = "hidden";
+          } else {
+              placeCards.push(player.placeCard);
+              player.canPlayCard = true;
+              player.placeCardElement.el.style.visibility = "visible";
+              var card = document.getElementById(player.name);
+              card.innerHTML = player.name;
+              player.setHand(player.hand);
+          }
+      }
+      nextPlayer.setHand(placeCards);
+  }
+
+  function Deck(cardsArray) {
+      this.cards = cardsArray; //array of cards
+
+      this.discard = function(card) {
+          this.cards.unshift(card);
+          return card;
+      }
+
+      this.draw = function() {
+          return this.cards.pop();
+      }
+
+      this.shuffle = function() {
+          // derived from https://github.com/Daplie/knuth-shuffle
+          var currentIndex = this.cards.length, temporaryValue, randomIndex;
+          while (0 !== currentIndex) {
+              randomIndex = Math.floor(Math.random() * currentIndex);
+              currentIndex -= 1;
+              temporaryValue = this.cards[currentIndex];
+              this.cards[currentIndex] = this.cards[randomIndex];
+              this.cards[randomIndex] = temporaryValue;
+          }
+          return this.cards;
+      }
+  }
+
+  function Card(color, text) {
+      this.owner = undefined; //Player obj or undefined
+      this.text = text;
+      this.color = color; //"black" or "white"
+
+      this.setOwner = function(name) {
+          if (this.owner == name) {
+              return false;
+          } else {
+              this.owner = name;
+              return true;
+          }
+      }
+      this.remOwner = function() {
+          if (this.owner === undefined) {
+              return false;
+          } else {
+              var oldOwner = this.owner;
+              this.owner = undefined;
+              return oldOwner;
+          }
+      }
   };
 
-  var Goal = function() {
-      this.pickGoal();
-      this.radiusesSquared = globals.itemSize * 2 * globals.itemSize;
-  };
+  function CardElement(card) {
+      this.card = card;
+      var el = document.createElement("div");
+      el.id = card.owner;
+      el.className = card.color + " card";
+      table.appendChild(el);
+      this.el = el;
 
-  Goal.prototype.pickGoal = function() {
-    this.position = pickRandomPosition();
-  };
+      this.set = function(card) {
+          this.card = card;
+          this.el.innerHTML = card.text;
+          return this.el;
+      }
 
-  Goal.prototype.hit = function(otherPosition) {
-    var dx = otherPosition.x - this.position.x;
-    var dy = otherPosition.y - this.position.y;
-    return dx * dx + dy * dy < this.radiusesSquared;
-  };
+      this.unset = function() {
+          this.el.innerHTML = this.card.owner;
+      }
+  }
 
   var Player = function(netPlayer, name) {
     this.netPlayer = netPlayer;
     this.name = name;
-    this.position = pickRandomPosition();
-    this.color = "green";
+    this.hand = [];
+    this.points = 0;
+    this.canPlayCard = false;
+    this.isTurn = false;
+    this.placeCard = new Card("black", name);
 
+    this.placeCard.setOwner(name);
+    this.placeCardElement = new CardElement(this.placeCard);
+    this.placeCardElement.set(this.placeCard);
+    playedBlackCardsElements.push(this.placeCardElement);
+
+    for (var i=0; i<handSize; ++i) {
+        var card = blackDeck.draw();
+        card.setOwner(name)
+        this.hand.push(card);
+    }
+    console.log(name + '\'s hand: ', this.hand);
+
+    netPlayer.addEventListener('playCard', Player.prototype.playCard.bind(this));
     netPlayer.addEventListener('disconnect', Player.prototype.disconnect.bind(this));
-    netPlayer.addEventListener('move', Player.prototype.movePlayer.bind(this));
-    netPlayer.addEventListener('color', Player.prototype.setColor.bind(this));
 
     this.playerNameManager = new PlayerNameManager(netPlayer);
     this.playerNameManager.on('setName', Player.prototype.handleNameMsg.bind(this));
   };
 
-  // The player disconnected.
+  Player.prototype.playCard = function(cmd) {
+      if (!this.canPlayCard) {
+          if (this.isTurn) {
+              for (var i=0; i<playedBlackCards.length; ++i) {
+                  if (playedBlackCards[i].text == cmd.text) {
+                      this.chooseCard(playedBlackCards[i]);
+                      return;
+                  }
+              }
+          } else {
+              return false;
+          }
+      }
+      var card = undefined;
+      for (var i=0; i<this.hand.length; ++i) {
+          if (this.hand[i].text == cmd.text) {
+              card = this.hand[i];
+              break;
+          }
+      }
+      if (card == undefined) {
+          return false;
+      }
+      this.canPlayCard = false;
+      this.hand.splice(this.hand.indexOf(card), 1);
+      playedBlackCards.push(card);
+      this.placeCardElement.set(card);
+      this.hand.push(blackDeck.draw());
+      if (playedBlackCards.length == players.length - 1) {
+          for (var i=0; i<players.length; ++i) {
+              var player = players[i];
+              if (player.isTurn) {
+                  console.log('played ', playedBlackCards);
+                  player.setHand(playedBlackCards);
+              }
+          }
+      }
+  }
+
+  Player.prototype.chooseCard = function(card) {
+      if (!this.isTurn) {
+          return false;
+      }
+      var owner = card.owner;
+      console.log(this.name + ' chose ' + owner + '\'s', card);
+      for (var i=0; i<players.length; ++i) {
+          var player = players[i];
+          if (player.name == card.owner) {
+              player.netPlayer.sendCmd('scored', {
+                  points: 1
+              });
+              this.isTurn = false;
+              nextTurn();
+              break;
+          }
+      }
+  }
+
+  Player.prototype.setHand = function(hand) {
+      this.netPlayer.sendCmd('setHand', {
+          hand: hand
+      });
+  };
+
   Player.prototype.disconnect = function() {
     for (var ii = 0; ii < players.length; ++ii) {
       var player = players[ii];
       if (player === this) {
         players.splice(ii, 1);
+        if (players.length < minPlayers) {
+            nextTurn();
+        }
+        console.log(player.name + " left");
         return;
       }
     }
   };
 
-  Player.prototype.movePlayer = function(cmd) {
-    this.position.x = Math.floor(cmd.x * canvas.clientWidth);
-    this.position.y = Math.floor(cmd.y * canvas.clientHeight);
-    if (goal.hit(this.position)) {
-      // This will generate a 'scored' event on the client (player's smartphone)
-      // that corresponds to this player.
-      this.netPlayer.sendCmd('scored', {
-        points: 5 + Misc.randInt(6), // 5 to 10 points
-      });
-      goal.pickGoal();
-    }
-  };
-
   Player.prototype.handleNameMsg = function(name) {
+    for (var i=0; i<players.length; ++i) {
+        if (players[i].name == name) {
+            console.log('that name is taken');
+            return false;
+        }
+    }
+    console.log(this.name + " renamed to " + name);
     this.name = name;
-  };
-
-  Player.prototype.setColor = function(cmd) {
-    this.color = cmd.color;
+    if (playedBlackCards.length == 0) {
+        this.placeCardElement.el.innerHTML = name;
+        this.placeCardElement.el.id = name;
+        this.placeCard.text = name;
+    }
+    for (var i=0; i<this.hand.length; ++i) {
+        this.hand[i].owner = name;
+        this.placeCard.setOwner(name);
+    }
   };
 
   var server = new GameServer();
   GameSupport.init(server, globals);
 
-  var goal = new Goal();
-
   // A new player has arrived.
   server.addEventListener('playerconnect', function(netPlayer, name) {
+    console.log(name + " joined");
+    if (players.length > maxPlayers) {
+        console.log("too many players");
+        return false;
+    }
     players.push(new Player(netPlayer, name));
+    if (players.length == minPlayers) {
+        nextTurn();
+    }
   });
 
-  var drawItem = function(position, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(position.x, position.y, globals.itemSize, 0, Math.PI * 2);
-    ctx.fill();
-  };
-
-  var render = function() {
-    Misc.resize(canvas);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    players.forEach(function(player) {
-      drawItem(player.position, player.color);
-    });
-    drawItem(goal.position, (globals.frameCount & 4) ? "red" : "pink");
-  };
-  GameSupport.run(globals, render);
+  GameSupport.run(globals, function(){});
 });
-
-
