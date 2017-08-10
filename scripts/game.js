@@ -74,12 +74,13 @@ requirejs([
   Misc.applyUrlSettings(globals);
 
   // load card contents
-  for (var i=0; i<100; ++i) {
-      var whiteCard = new Card("white", "card text #" + i);
-      whiteCards.push(whiteCard);
-
-      var blackCard = new Card("black", "card text #" + i);
-      blackCards.push(blackCard);
+  var blackCardContents = require('../content/cah/wcards.json');
+  var whiteCardContents = require('../content/cah/bcards.json');
+  for (var i=0; i<blackCardContents.cards.length; ++i) {
+      blackCards.push(new Card("black", blackCardContents.cards[i]));
+  }
+  for (var i=0; i<whiteCardContents.cards.length; ++i) {
+      whiteCards.push(new Card("white", whiteCardContents.cards[i]));
   }
   whiteDeck = new Deck(whiteCards);
   blackDeck = new Deck(blackCards);
@@ -204,7 +205,7 @@ requirejs([
 
     for (var i=0; i<handSize; ++i) {
         var card = blackDeck.draw();
-        card.setOwner(name)
+        card.setOwner(name);
         this.hand.push(card);
     }
     console.log(name + '\'s hand: ', this.hand);
