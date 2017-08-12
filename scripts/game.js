@@ -225,6 +225,9 @@ requirejs([
     netPlayer.addEventListener('disconnect', Player.prototype.disconnect.bind(this));
     netPlayer.addEventListener('startGame', function() {
         if (players.length >= minPlayers) {
+            for (var i=0; i<players.length; ++i) {
+                players[i].setHand(players[i].hand);
+            }
             nextTurn();
         }
     });
@@ -353,7 +356,6 @@ requirejs([
     player.placeCardElement.el.style.visibility = "visible";
     var card = document.getElementById(player.name);
     card.innerHTML = player.name;
-    player.setHand(player.hand);
   });
 
   GameSupport.run(globals, function(){});

@@ -60,7 +60,6 @@ requirejs([
   var handSize = 5;
   var isTurn = false;
   var client = new GameClient();
-  var gameStarted = false;
 
   CommonUI.setupStandardControllerUI(client, globals);
   CommonUI.askForNameOnce();   // ask for the user's name if not set
@@ -74,13 +73,7 @@ requirejs([
 
   // Set hand
   client.addEventListener('setHand', function(cmd) {
-      var gameStarter = document.getElementById("gameStarter");
-      if (!gameStarted & cmd.isTurn) {
-          isTurn = true;
-          gameStarter.style.visibility = "visible";
-      } else {
-          gameStarter.style.visibility = "hidden";
-      }
+      document.getElementById("gameStarter").style.visibility = "hidden";
       handElements = [];
       hand.innerHTML = "";
       for (var i=0; i<cmd.hand.length; ++i) {
@@ -89,11 +82,7 @@ requirejs([
   });
 
   document.getElementById("gameStarter").onclick = function() {
-      if (isTurn) {
-          gameStarted = true;
-          client.sendCmd('startGame');
-          gameStarter.style.visibility = "hidden";
-      }
+      client.sendCmd('startGame');
   }
 
   function Card(color, text) {
