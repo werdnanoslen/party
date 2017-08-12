@@ -264,7 +264,9 @@ requirejs([
       this.hand.splice(this.hand.indexOf(card), 1);
       playedBlackCards.push(card);
       this.placeCardElement.set(card);
-      this.hand.push(blackDeck.draw());
+      var newCard = blackDeck.draw();
+      newCard.setOwner(this.name);
+      this.hand.push(newCard);
       this.setHand(this.hand);
       if (playedBlackCards.length == players.length - 1) {
           for (var i=0; i<players.length; ++i) {
