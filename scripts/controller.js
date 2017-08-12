@@ -35,10 +35,12 @@ requirejs([
     '../node_modules/happyfuntimes/dist/hft',
     '../node_modules/hft-sample-ui/dist/sample-ui',
     '../node_modules/hft-game-utils/dist/game-utils',
+    '../node_modules/angular/angular.js'
   ], function(
     hft,
     sampleUI,
-    gameUtils) {
+    gameUtils,
+    angular) {
 
   var GameClient = hft.GameClient;
   var CommonUI = sampleUI.commonUI;
