@@ -29,12 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#status {
-  height 10%;
-}
 #table {
-  width: 100%;
-  text-align: center;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
 }
 body {
     background-color: white;
