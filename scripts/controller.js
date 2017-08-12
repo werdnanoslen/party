@@ -75,7 +75,7 @@ requirejs([
   // Set hand
   client.addEventListener('setHand', function(cmd) {
       var gameStarter = document.getElementById("gameStarter");
-      if (!gameStarted && cmd.isTurn) {
+      if (!gameStarted & cmd.isTurn) {
           isTurn = true;
           gameStarter.style.visibility = "visible";
       } else {
@@ -90,6 +90,7 @@ requirejs([
 
   document.getElementById("gameStarter").onclick = function() {
       if (isTurn) {
+          gameStarted = true;
           client.sendCmd('startGame');
           gameStarter.style.visibility = "hidden";
       }
@@ -128,7 +129,6 @@ requirejs([
       this.el = el;
 
       this.el.onclick = function(event) {
-          gameStarted = true;
           client.sendCmd('playCard', {
             text: this.innerHTML
           });
