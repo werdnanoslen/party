@@ -268,7 +268,6 @@ requirejs([
               if (player.isTurn) {
                   player.setHand(playedBlackCards);
               } else {
-                  console.log(playedBlackCardsElements);
                   playedBlackCardsElements[i].reveal();
               }
           }
