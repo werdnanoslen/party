@@ -36,103 +36,104 @@ requirejs([
     '../node_modules/hft-sample-ui/dist/sample-ui',
     '../node_modules/hft-game-utils/dist/game-utils',
     '../node_modules/angular/angular.js'
-  ], function(
+], function(
     hft,
     sampleUI,
     gameUtils,
     angular) {
 
-  var GameClient = hft.GameClient;
-  var CommonUI = sampleUI.commonUI;
-  var Input = sampleUI.input;
-  var Misc = sampleUI.misc;
-  var MobileHacks = sampleUI.mobileHacks;
-  var Touch = sampleUI.touch;
+var GameClient = hft.GameClient;
+var CommonUI = sampleUI.commonUI;
+var Input = sampleUI.input;
+var Misc = sampleUI.misc;
+var MobileHacks = sampleUI.mobileHacks;
+var Touch = sampleUI.touch;
 
-  var globals = {
+var globals = {
     debug: false,
-  };
-  Misc.applyUrlSettings(globals);
-  MobileHacks.fixHeightHack();
+};
+Misc.applyUrlSettings(globals);
+MobileHacks.fixHeightHack();
 
-  var score = 0;
-  var statusElem = document.getElementById("gamestatus");
-  var hand = document.getElementById("hand");
-  var handElements = [];
-  var handSize = 5;
-  var isTurn = false;
-  var client = new GameClient();
+var score = 0;
+var statusElem = document.getElementById("gamestatus");
+var hand = document.getElementById("hand");
+var handElements = [];
+var handSize = 5;
+var isTurn = false;
+var client = new GameClient();
 
-  CommonUI.setupStandardControllerUI(client, globals);
-  CommonUI.askForNameOnce();   // ask for the user's name if not set
-  CommonUI.showMenu(true);     // shows the gear menu
+CommonUI.setupStandardControllerUI(client, globals);
+CommonUI.askForNameOnce(); // ask for the user's name if not set
+CommonUI.showMenu(true); // shows the gear menu
 
-  // Update our score when the game tells us.
-  client.addEventListener('scored', function(cmd) {
+// Update our score when the game tells us.
+client.addEventListener('scored', function(cmd) {
     score += cmd.points;
     statusElem.innerHTML = "Score: " + score;
-  });
+});
 
-  // Set hand
-  client.addEventListener('setHand', function(cmd) {
-      document.getElementById("gameStarter").style.visibility = "hidden";
-      handElements = [];
-      hand.innerHTML = "";
-      for (var i=0; i<cmd.hand.length; ++i) {
-          handElements.push(new CardElement(cmd.hand[i]));
-      }
-  });
+// Set hand
+client.addEventListener('setHand', function(cmd) {
+    document.getElementById("gameStarter").style.visibility = "hidden";
+    handElements = [];
+    hand.innerHTML = "";
+    for (var i = 0; i < cmd.hand.length; ++i) {
+        handElements.push(new CardElement(cmd.hand[i]));
+    }
+});
 
-  document.getElementById("gameStarter").onclick = function() {
-      client.sendCmd('startGame');
-  }
+document.getElementById("gameStarter").onclick = function() {
+    client.sendCmd('startGame');
+}
 
-  function Card(color, text) {
-      this.owner = undefined; //Player obj or undefined
-      this.text = text;
-      this.color = color; //"black" or "white"
+function Card(color, text) {
+    this.owner = undefined; //Player obj or undefined
+    this.text = text;
+    this.color = color; //"black" or "white"
 
-      this.setOwner = function(name) {
-          if (this.owner == name) {
-              return false;
-          } else {
-              this.owner = name;
-              return true;
-          }
-      }
-      this.remOwner = function() {
-          if (this.owner === undefined) {
-              return false;
-          } else {
-              var oldOwner = this.owner;
-              this.owner = undefined;
-              return oldOwner;
-          }
-      }
-  };
+    this.setOwner = function(name) {
+        if (this.owner == name) {
+            return false;
+        } else {
+            this.owner = name;
+            return true;
+        }
+    }
+    this.remOwner = function() {
+        if (this.owner === undefined) {
+            return false;
+        } else {
+            var oldOwner = this.owner;
+            this.owner = undefined;
+            return oldOwner;
+        }
+    }
+};
 
-  function CardElement(card) {
-      this.card = card;
-      var el = document.createElement("div");
-      el.className = card.color + " card";
-      el.innerHTML = card.text;
-      hand.appendChild(el);
-      this.el = el;
+function CardElement(card) {
+    this.card = card;
+    var el = document.createElement("div");
+    el.className = card.color + " card";
+    el.innerHTML = card.text;
+    hand.appendChild(el);
+    this.el = el;
 
-      this.el.onclick = function(event) {
-          client.sendCmd('playCard', {
+    this.el.onclick = function(event) {
+        client.sendCmd('playCard', {
             text: this.innerHTML
-          });
-      }
+        });
+    }
 
-      this.set = function(card) {
-          this.card = card;
-          this.el.innerHTML = card.text;
-          return this.el;
-      }
+    this.set = function(card) {
+        this.card = card;
+        this.el.innerHTML = card.text;
+        return this.el;
+    }
 
-      this.unset = function() {
-          this.el.innerHTML = this.card.owner;
-      }
-  }
+    this.unset = function() {
+        this.el.innerHTML = this.card.owner;
+    }
+}
+
 });
