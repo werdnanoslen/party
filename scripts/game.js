@@ -65,7 +65,7 @@ requirejs([
   var whiteDeck = undefined;
   var blackDeck = undefined;
   var playedWhiteCard = undefined;
-  var playedWhiteCardElement = new CardElement(new Card("white", ""));
+  var playedWhiteCardElement = new CardElement(new Card("white", "Cards Against Humanity."));
   var playedBlackCards = [];
   var playedBlackCardsElements = [];
   var globals = {
@@ -84,6 +84,7 @@ requirejs([
   }
   whiteDeck = new Deck(whiteCards);
   blackDeck = new Deck(blackCards);
+  playedWhiteCardElement.set(playedWhiteCardElement.card);
 
   function nextTurn() {
       if (players.length < minPlayers) {

@@ -32,10 +32,9 @@
 #status {
   height 10%;
 }
-#playfield {
+#table {
   width: 100%;
-  height: 90%;
-  background: none;
+  text-align: center;
 }
 body {
     background-color: white;
@@ -43,6 +42,7 @@ body {
 .black {
     background: black;
     color: white;
+    border: 1px solid black;
 }
 .white {
     background: white;
@@ -60,4 +60,5 @@ body {
     padding: 18px 12px;
     margin: 10px;
     display: inline-block;
+    vertical-align: middle;
 }

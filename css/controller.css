@@ -55,6 +55,7 @@
 .black {
     background: black;
     color: white;
+    border: 1px solid black;
 }
 .card {
     font-size: 12px;
@@ -68,4 +69,5 @@
     margin: 10px;
     display: inline-block;
     cursor: pointer;
+    vertical-align: middle;
 }
