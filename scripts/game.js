@@ -84,7 +84,6 @@ requirejs([
   }
   whiteDeck = new Deck(whiteCards);
   blackDeck = new Deck(blackCards);
-  nextTurn();
 
   function nextTurn() {
       if (players.length < minPlayers) {
@@ -93,6 +92,8 @@ requirejs([
       }
       for (var i=0; i<playedBlackCards.length; ++i) {
           blackDeck.discard(playedBlackCards[i]);
+      }
+      for (var i=0; i<playedBlackCardsElements.length; ++i) {
           playedBlackCardsElements[i].unset();
       }
       playedBlackCards = [];
@@ -101,20 +102,22 @@ requirejs([
       playedWhiteCardElement.set(playedWhiteCard);
       nextPlayer = players[((++turn) % players.length)];
       nextPlayer.isTurn = true;
+      nextPlayer.canPlayCard = false;
+      for (var i=0; i<players.length; ++i) {
+          var player = players[i];
+          if (player === nextPlayer) {
+              player.placeCardElement.el.style.visibility = "hidden";
+          } else {
+              player.placeCardElement.el.style.visibility = "visible";
+          }
+      }
       console.log("it's " + nextPlayer.name + "'s turn");
       var placeCards = [];
       for (var i=0; i<players.length; ++i) {
           var player = players[i];
-          if (nextPlayer.name == player.name) {
-              player.canPlayCard = false;
-              player.placeCardElement.el.style.visibility = "hidden";
-          } else {
+          if (!player.isTurn) {
               placeCards.push(player.placeCard);
               player.canPlayCard = true;
-              player.placeCardElement.el.style.visibility = "visible";
-              var card = document.getElementById(player.name);
-              card.innerHTML = player.name;
-              player.setHand(player.hand);
           }
       }
       nextPlayer.setHand(placeCards);
@@ -212,6 +215,11 @@ requirejs([
 
     netPlayer.addEventListener('playCard', Player.prototype.playCard.bind(this));
     netPlayer.addEventListener('disconnect', Player.prototype.disconnect.bind(this));
+    netPlayer.addEventListener('startGame', function() {
+        if (players.length >= minPlayers) {
+            nextTurn();
+        }
+    });
 
     this.playerNameManager = new PlayerNameManager(netPlayer);
     this.playerNameManager.on('setName', Player.prototype.handleNameMsg.bind(this));
@@ -249,7 +257,6 @@ requirejs([
           for (var i=0; i<players.length; ++i) {
               var player = players[i];
               if (player.isTurn) {
-                  console.log('played ', playedBlackCards);
                   player.setHand(playedBlackCards);
               }
           }
@@ -260,6 +267,7 @@ requirejs([
       if (!this.isTurn) {
           return false;
       }
+      this.setHand(this.hand);
       var owner = card.owner;
       console.log(this.name + ' chose ' + owner + '\'s', card);
       for (var i=0; i<players.length; ++i) {
@@ -277,7 +285,8 @@ requirejs([
 
   Player.prototype.setHand = function(hand) {
       this.netPlayer.sendCmd('setHand', {
-          hand: hand
+          hand: hand,
+          isTurn: this.isTurn
       });
   };
 
@@ -325,10 +334,15 @@ requirejs([
         console.log("too many players");
         return false;
     }
-    players.push(new Player(netPlayer, name));
-    if (players.length == minPlayers) {
-        nextTurn();
+    var player = new Player(netPlayer, name);
+    if (players.length == 0) {
+        player.isTurn = true;
     }
+    players.push(player);
+    player.placeCardElement.el.style.visibility = "visible";
+    var card = document.getElementById(player.name);
+    card.innerHTML = player.name;
+    player.setHand(player.hand);
   });
 
   GameSupport.run(globals, function(){});

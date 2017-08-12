@@ -58,7 +58,9 @@ requirejs([
   var hand = document.getElementById("hand");
   var handElements = [];
   var handSize = 5;
+  var isTurn = false;
   var client = new GameClient();
+  var gameStarted = false;
 
   CommonUI.setupStandardControllerUI(client, globals);
   CommonUI.askForNameOnce();   // ask for the user's name if not set
@@ -72,12 +74,26 @@ requirejs([
 
   // Set hand
   client.addEventListener('setHand', function(cmd) {
+      var gameStarter = document.getElementById("gameStarter");
+      if (!gameStarted && cmd.isTurn) {
+          isTurn = true;
+          gameStarter.style.visibility = "visible";
+      } else {
+          gameStarter.style.visibility = "hidden";
+      }
       handElements = [];
       hand.innerHTML = "";
       for (var i=0; i<cmd.hand.length; ++i) {
           handElements.push(new CardElement(cmd.hand[i]));
       }
   });
+
+  document.getElementById("gameStarter").onclick = function() {
+      if (isTurn) {
+          client.sendCmd('startGame');
+          gameStarter.style.visibility = "hidden";
+      }
+  }
 
   function Card(color, text) {
       this.owner = undefined; //Player obj or undefined
@@ -112,6 +128,7 @@ requirejs([
       this.el = el;
 
       this.el.onclick = function(event) {
+          gameStarted = true;
           client.sendCmd('playCard', {
             text: this.innerHTML
           });
