@@ -183,12 +183,20 @@ requirejs([
 
       this.set = function(card) {
           this.card = card;
-          this.el.innerHTML = card.text;
+          if (card.color == "black") {
+              this.el.innerHTML = card.owner + " PLAYED"
+          } else {
+              this.el.innerHTML = card.text;
+          }
           return this.el;
       }
 
+      this.reveal = function() {
+          this.el.innerHTML = this.card.text;
+      }
+
       this.unset = function() {
-          this.el.innerHTML = this.card.owner;
+          this.el.innerHTML = "WAITING ON " + this.card.owner;
       }
   }
 
@@ -253,11 +261,15 @@ requirejs([
       playedBlackCards.push(card);
       this.placeCardElement.set(card);
       this.hand.push(blackDeck.draw());
+      this.setHand(this.hand);
       if (playedBlackCards.length == players.length - 1) {
           for (var i=0; i<players.length; ++i) {
               var player = players[i];
               if (player.isTurn) {
                   player.setHand(playedBlackCards);
+              } else {
+                  console.log(playedBlackCardsElements);
+                  playedBlackCardsElements[i].reveal();
               }
           }
       }
