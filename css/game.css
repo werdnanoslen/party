@@ -53,8 +53,8 @@ body {
     font-weight: bold;
     text-align: left;
     font-family: "Helvetica Neue", Helvetica, "Open Sans", sans-serif;
-    width: 150px;
-    height: 225px;
+    width: 16vw;
+    height: 22vw;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
     padding: 18px 12px;
     margin: 10px;
