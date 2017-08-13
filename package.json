@@ -34,7 +34,6 @@
     },
     "homepage": "https://github.com/greggman/hft-simple#readme",
     "dependencies": {
-        "angular": "^1.6.5",
         "happyfuntimes": "^0.2.1",
         "hft-game-utils": "^1.0.0",
         "hft-sample-ui": "^1.0.0",
