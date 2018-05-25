@@ -103,6 +103,8 @@ requirejs([
         playedWhiteCardElement.set(playedWhiteCard);
         nextPlayer = players[((++turn) % players.length)];
         nextPlayer.isTurn = true;
+        var title = document.getElementById('title');
+        title.innerText = "It's " + nextPlayer.name + "\'s turn."
         nextPlayer.canPlayCard = false;
         for (var i = 0; i < players.length; ++i) {
             var player = players[i];
@@ -325,7 +327,7 @@ requirejs([
                 } else {
                     var morePeopleNeeded = minPlayers - players.length;
                     console.log(morePeopleNeeded);
-                    if (morePeopleNeeded < 1) {
+                    if (morePeopleNeeded < 1 & turn === -1) {
                         title.innerText = "Ready when you are, friend."
                     } else if (morePeopleNeeded === 1) {
                         title.innerText = "Please nab at least one more horrible person."
@@ -385,7 +387,7 @@ requirejs([
         card.innerHTML = player.name;
 
         var morePeopleNeeded = minPlayers - players.length;
-        if (morePeopleNeeded < 1) {
+        if (morePeopleNeeded < 1 & turn === -1) {
             title.innerText = "Ready when you are, friend."
         } else if (morePeopleNeeded === 1) {
             title.innerText = "Please nab at least one more horrible person."
