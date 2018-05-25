@@ -1,4 +1,4 @@
-Derivative Copyright 2017, Andrew Nelson.
+Derivative work by Andrew Nelson <andy@andyhub.com> based on the work of...
 Copyright 2014, Gregg Tavares.
 
 All rights reserved.

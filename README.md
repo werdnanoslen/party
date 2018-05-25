@@ -1,8 +1,8 @@
 Party
 ======
 
-This is a game for the [HappyFunTimes party games system](http://greggman.github.io/HappyFunTimes).
-
+This is a CAH game based on the [HappyFunTimes party games system](http://greggman.github.io/HappyFunTimes). Download it, run `npm start`, load it up on a big screen and then direct other devices 
+to follow instructions on the screen.
 
 Cloning
 -------

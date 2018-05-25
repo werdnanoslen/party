@@ -1,4 +1,5 @@
 /*
+ * Derivative work by Andrew Nelson <andy@andyhub.com> based on the work of...
  * Copyright 2014, Gregg Tavares.
  * All rights reserved.
  *
