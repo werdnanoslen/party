@@ -58,8 +58,8 @@ requirejs([
     var turn = -1;
     var nextPlayer = undefined;
     var handSize = 5;
-    var maxPlayers = 5;
-    var minPlayers = 2;
+    var maxPlayers = 12;
+    var minPlayers = 3;
     var whiteCards = [];
     var blackCards = [];
     var whiteDeck = undefined;
@@ -231,6 +231,8 @@ requirejs([
                     players[i].setHand(players[i].hand);
                 }
                 nextTurn();
+            } else {
+                alert("You're the only player right now, and you need at least two to start the game.")
             }
         });
 
@@ -312,7 +314,26 @@ requirejs([
         for (var ii = 0; ii < players.length; ++ii) {
             var player = players[ii];
             if (player === this) {
-                players.splice(ii, 1);
+                var deletedPlayer = players.splice(ii, 1);
+                deletedPlayer[0].placeCardElement.el.remove();
+                delete deletedPlayer[0];
+
+                var title = document.getElementById('title');
+                if (players.length > maxPlayers) {
+                    console.log("too many players");
+                    title.innerHTML = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
+                } else {
+                    var morePeopleNeeded = minPlayers - players.length;
+                    console.log(morePeopleNeeded);
+                    if (morePeopleNeeded < 1) {
+                        title.innerText = "Ready when you are, friend."
+                    } else if (morePeopleNeeded === 1) {
+                        title.innerText = "Please nab at least one more horrible person."
+                    } else if (morePeopleNeeded > 1){
+                        title.innerText = "Please nab at least " + morePeopleNeeded + " more horrible people."
+                    }
+                }
+
                 if (players.length < minPlayers) {
                     nextTurn();
                 }
@@ -348,8 +369,10 @@ requirejs([
     // A new player has arrived.
     server.addEventListener('playerconnect', function(netPlayer, name) {
         console.log(name + " joined");
-        if (players.length > maxPlayers) {
+        var title = document.getElementById('title');
+        if (players.length >= maxPlayers) {
             console.log("too many players");
+            title.innerHTML = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
             return false;
         }
         var player = new Player(netPlayer, name);
@@ -360,6 +383,15 @@ requirejs([
         player.placeCardElement.el.style.visibility = "visible";
         var card = document.getElementById(player.name);
         card.innerHTML = player.name;
+
+        var morePeopleNeeded = minPlayers - players.length;
+        if (morePeopleNeeded < 1) {
+            title.innerText = "Ready when you are, friend."
+        } else if (morePeopleNeeded === 1) {
+            title.innerText = "Please nab at least one more horrible person."
+        } else if (morePeopleNeeded > 1){
+            title.innerText = "Please nab at least " + morePeopleNeeded + " more horrible people."
+        }
     });
 
     GameSupport.run(globals, function() {});
