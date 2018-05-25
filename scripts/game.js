@@ -60,47 +60,47 @@ requirejs([
     var handSize = 5;
     var maxPlayers = 12;
     var minPlayers = 3;
-    var whiteCards = [];
     var blackCards = [];
-    var whiteDeck = undefined;
+    var whiteCards = [];
     var blackDeck = undefined;
-    var playedWhiteCard = undefined;
-    var playedWhiteCardElement = new CardElement(new Card("white", "Cards Against Humanity."));
-    var playedBlackCards = [];
-    var playedBlackCardsElements = [];
+    var whiteDeck = undefined;
+    var playedBlackCard = undefined;
+    var playedBlackCardElement = new CardElement(new Card("black", "Cards Against Humanity."));
+    var playedWhiteCards = [];
+    var playedWhiteCardsElements = [];
     var globals = {
         itemSize: 15,
     };
     Misc.applyUrlSettings(globals);
 
     // load card contents
-    var blackCardContents = require('../content/cah/wcards.json');
-    var whiteCardContents = require('../content/cah/bcards.json');
-    for (var i = 0; i < blackCardContents.cards.length; ++i) {
-        blackCards.push(new Card("black", blackCardContents.cards[i]));
-    }
+    var whiteCardContents = require('../content/cah/wcards.json');
+    var blackCardContents = require('../content/cah/bcards.json');
     for (var i = 0; i < whiteCardContents.cards.length; ++i) {
         whiteCards.push(new Card("white", whiteCardContents.cards[i]));
     }
-    whiteDeck = new Deck(whiteCards);
+    for (var i = 0; i < blackCardContents.cards.length; ++i) {
+        blackCards.push(new Card("black", blackCardContents.cards[i]));
+    }
     blackDeck = new Deck(blackCards);
-    playedWhiteCardElement.set(playedWhiteCardElement.card);
+    whiteDeck = new Deck(whiteCards);
+    playedBlackCardElement.set(playedBlackCardElement.card);
 
     function nextTurn() {
         if (players.length < minPlayers) {
             console.log("not enough players");
             return;
         }
-        for (var i = 0; i < playedBlackCards.length; ++i) {
-            blackDeck.discard(playedBlackCards[i]);
+        for (var i = 0; i < playedWhiteCards.length; ++i) {
+            whiteDeck.discard(playedWhiteCards[i]);
         }
-        for (var i = 0; i < playedBlackCardsElements.length; ++i) {
-            playedBlackCardsElements[i].unset();
+        for (var i = 0; i < playedWhiteCardsElements.length; ++i) {
+            playedWhiteCardsElements[i].unset();
         }
-        playedBlackCards = [];
-        whiteDeck.discard(playedWhiteCard);
-        playedWhiteCard = whiteDeck.draw();
-        playedWhiteCardElement.set(playedWhiteCard);
+        playedWhiteCards = [];
+        blackDeck.discard(playedBlackCard);
+        playedBlackCard = blackDeck.draw();
+        playedBlackCardElement.set(playedBlackCard);
         nextPlayer = players[((++turn) % players.length)];
         nextPlayer.isTurn = true;
         var title = document.getElementById('title');
@@ -156,7 +156,7 @@ requirejs([
     function Card(color, text) {
         this.owner = undefined; //Player obj or undefined
         this.text = text;
-        this.color = color; //"black" or "white"
+        this.color = color; //"white" or "black"
 
         this.setOwner = function(name) {
             if (this.owner == name) {
@@ -187,7 +187,7 @@ requirejs([
 
         this.set = function(card) {
             this.card = card;
-            if (card.color == "black") {
+            if (card.color == "white") {
                 this.el.innerHTML = card.owner + " PLAYED"
             } else {
                 this.el.innerHTML = card.text;
@@ -211,15 +211,15 @@ requirejs([
         this.points = 0;
         this.canPlayCard = false;
         this.isTurn = false;
-        this.placeCard = new Card("black", name);
+        this.placeCard = new Card("white", name);
 
         this.placeCard.setOwner(name);
         this.placeCardElement = new CardElement(this.placeCard);
         this.placeCardElement.set(this.placeCard);
-        playedBlackCardsElements.push(this.placeCardElement);
+        playedWhiteCardsElements.push(this.placeCardElement);
 
         for (var i = 0; i < handSize; ++i) {
-            var card = blackDeck.draw();
+            var card = whiteDeck.draw();
             card.setOwner(name);
             this.hand.push(card);
         }
@@ -245,9 +245,9 @@ requirejs([
     Player.prototype.playCard = function(cmd) {
         if (!this.canPlayCard) {
             if (this.isTurn) {
-                for (var i = 0; i < playedBlackCards.length; ++i) {
-                    if (playedBlackCards[i].text == cmd.text) {
-                        this.chooseCard(playedBlackCards[i]);
+                for (var i = 0; i < playedWhiteCards.length; ++i) {
+                    if (playedWhiteCards[i].text == cmd.text) {
+                        this.chooseCard(playedWhiteCards[i]);
                         return;
                     }
                 }
@@ -267,19 +267,19 @@ requirejs([
         }
         this.canPlayCard = false;
         this.hand.splice(this.hand.indexOf(card), 1);
-        playedBlackCards.push(card);
+        playedWhiteCards.push(card);
         this.placeCardElement.set(card);
-        var newCard = blackDeck.draw();
+        var newCard = whiteDeck.draw();
         newCard.setOwner(this.name);
         this.hand.push(newCard);
         this.setHand(this.hand);
-        if (playedBlackCards.length == players.length - 1) {
+        if (playedWhiteCards.length == players.length - 1) {
             for (var i = 0; i < players.length; ++i) {
                 var player = players[i];
                 if (player.isTurn) {
-                    player.setHand(playedBlackCards);
+                    player.setHand(playedWhiteCards);
                 } else {
-                    playedBlackCardsElements[i].reveal();
+                    playedWhiteCardsElements[i].reveal();
                 }
             }
         }
@@ -354,7 +354,7 @@ requirejs([
         }
         console.log(this.name + " renamed to " + name);
         this.name = name;
-        if (playedBlackCards.length == 0) {
+        if (playedWhiteCards.length == 0) {
             this.placeCardElement.el.innerHTML = name;
             this.placeCardElement.el.id = name;
             this.placeCard.text = name;
