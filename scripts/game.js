@@ -75,8 +75,8 @@ requirejs([
     Misc.applyUrlSettings(globals);
 
     // load card contents
-    var whiteCardContents = require('../content/cah/wcards.json');
-    var blackCardContents = require('../content/cah/bcards.json');
+    var whiteCardContents = require('../content/cah/core_wcards.json');
+    var blackCardContents = require('../content/cah/core_bcards.json');
     for (var i = 0; i < whiteCardContents.cards.length; ++i) {
         whiteCards.push(new Card("white", whiteCardContents.cards[i]));
     }
