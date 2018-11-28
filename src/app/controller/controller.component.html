@@ -1,0 +1,14 @@
+<div id="hand">
+    <div *ngFor="let card of cards"
+        [(ngModel)]="card.text"
+        [class]="card.color"
+        class="card"
+        (click)="playCard(card.text)">
+    </div>
+</div>
+
+<div id="status">
+    <h1>Score: <span [(ngModel)]="loadScore('player')"</h1>
+    <input name="name" type="text" id="name" autocorrect="off" spellcheck="false" />
+    <button id="gameStarter" (click)="startGame()" [class.hidden]='isGameStarted'>Start Game</button>
+</div>
