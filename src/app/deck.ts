@@ -1,22 +1,28 @@
 import { Card } from 'src/app/card';
 
 export class Deck {
-    cards: Card[] = [];
+    public cards: Card[] = [];
+    private drawCount: number = 0;
 
-    constructor(cardsArray) {
-        this.cards = cardsArray;
+    constructor(cards) {
+        this.cards = cards;
+        this.shuffle();
     }
 
-    discard(card) {
+    public discard(card) {
         this.cards.unshift(card);
-        return card;
     }
 
-    draw() {
+    public draw() {
+        this.drawCount++;
+        if (this.drawCount > this.cards.length) {
+            this.shuffle();
+            this.drawCount = 0;
+        }
         return this.cards.pop();
     }
 
-    shuffle() {
+    private shuffle() {
         // derived from https://github.com/Daplie/knuth-shuffle
         var currentIndex = this.cards.length,
             temporaryValue, randomIndex;
@@ -27,6 +33,5 @@ export class Deck {
             this.cards[currentIndex] = this.cards[randomIndex];
             this.cards[randomIndex] = temporaryValue;
         }
-        return this.cards;
     }
 }

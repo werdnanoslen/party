@@ -10,42 +10,32 @@ import { Card } from 'src/app/card';
     styleUrls: ['./controller.component.css']
 })
 
-export class ControllerComponent implements OnInit {
-    score: Observable<number>;
-    isGameStarted: Observable<boolean>;
-    isTurn: Observable<boolean>;
-    readonly handSize = 5;
-    cards: Observable<Card[]>;
+export class ControllerComponent {
+    private player: Player;
+    private gameService: GameService;
 
-    constructor(private gameService: GameService) { }
-
-    ngOnInit() {
-        this.score = this.gameService.score;
-        this.isGameStarted = this.gameService.gameStarted;
-        this.isTurn = this.gameService.turn;
-        this.cards = this.gameService.cards;
+    constructor(player: Player, gameService: GameService) {
+        this.player = player;
+        this.gameService = gameService;
     }
 
-    loadScore() {
-        this.gameService.getScore;
+    private setName(name: string) {
+        this.player.setName(name);
     }
 
-    startGame() {
-        if (players.length >= minPlayers) {
-            for (var i = 0; i < players.length; ++i) {
-                players[i].setHand(players[i].hand);
-            }
-            this.gameService.startGame;
-        } else {
-            alert("You're the only player right now, and you need at least two to start the game.")
-        }
+    private acceptCard(card: Card) {
+        this.player.acceptCard(card);
     }
 
-    setCards(cards) {
-        this.gameService.getCards;
+    private playCard(card: Card) {
+        this.player.playCard(card);
     }
 
-    playCard(card) {
-        this.gameService.playCard;
+    private chooseCard(card: Card) {
+        this.gameService.chooseCard(card);
+    }
+
+    private startGame() {
+        this.gameService.startGame();
     }
 }

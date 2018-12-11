@@ -59,8 +59,8 @@ io.on('connection', socket => {
 });
 
 app.get('/', (req, res) => {
-  if (!gameStarted) {
-    gameStarted = true;
+  if (!isGameStarted) {
+    isGameStarted = true;
     console.log('sending game');
     res.send('game');
   } else {

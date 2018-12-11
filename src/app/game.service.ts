@@ -1,54 +1,117 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
+import { Player } from './player';
+import { Card } from './card';
+import { Deck } from './deck';
+import * as BLACK_CARD_CONTENTS from "src/assets/cards/core_bcards.json";
+import * as WHITE_CARD_CONTENTS from "src/assets/cards/core_wcards.json";
+
+const HAND_SIZE: number = 5;
+const MAX_PLAYERS: number = 12;
+const MIN_PLAYERS: number = 3;
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
+
 export class GameService {
-  currentDocument = this.socket.fromEvent<Document>('document');
-  documents = this.socket.fromEvent<string[]>('documents');
-  score = this.socket.fromEvent<number>('score');
-  gameStarted = this.socket.fromEvent<boolean>('isGameStarted');
-  turn = this.socket.fromEvent<boolean>('isTurn');
-  cards = this.socket.fromEvent<string[]>('getCards');
-  playedCard = this.socket.fromEvent<string>('playCard');
+    public players: Player[] = [];
+    public currentPlayer: Player;
+    public cardsInPlay: { player: Player, card: Card }[] = [];
+    public blackCard: Card;
+    public whiteDeck: Deck;
+    public blackDeck: Deck;
 
-  constructor(private socket: Socket) { }
+    constructor(private socket: Socket) { }
 
-  getScore(playerId: string) {
-      this.socket.emit('getScore', playerId);
-  }
+    ngOnInit() {
+        let blackCards = [];
+        let whiteCards = [];
+        for (let i = 0; i < WHITE_CARD_CONTENTS['cards'].length; ++i) {
+            whiteCards.push(new Card(WHITE_CARD_CONTENTS['cards'][i], 'white'));
+        }
+        for (let i = 0; i < BLACK_CARD_CONTENTS['cards'].length; ++i) {
+            blackCards.push(new Card(BLACK_CARD_CONTENTS['cards'][i], 'black'));
+        }
+        this.blackDeck = new Deck(blackCards);
+        this.whiteDeck = new Deck(whiteCards);
+    }
 
-  getCards(playerId: string) {
-      this.socket.emit('getCards', playerId);
-  }
+    public startGame() {
+        if (this.players.length < MIN_PLAYERS) {
+            alert("Not enough players.")
+        } else {
+            this.currentPlayer = this.players[0];
+        }
+        this.socket.emit('startGame');
+    }
 
-  playCard(playerId: string, card: string) {
-      this.socket.emit('playCard', {'playerId': playerId, 'card': card});
-  }
+    private nextTurn() {
+        // discard cards
+        this.blackDeck.discard(this.blackCard);
+        this.blackCard = undefined;
+        for (let c = 0; c < this.cardsInPlay.length; ++c) {
+            let card:Card = this.cardsInPlay.pop().card;
+            this.whiteDeck.discard(card);
+        }
 
-  isGameStarted() {
-      this.socket.emit('isGameStarted');
-  }
+        // draw cards
+        this.blackCard = this.blackDeck.draw();
 
-  isTurn(playerId: string) {
-      this.socket.emit('isTurn')
-  }
+        // next player
+        let curr:number = this.players.indexOf(this.currentPlayer);
+        let next:number = ++curr % this.players.length;
+        this.currentPlayer = this.players[next];
+        console.log("it's " + this.currentPlayer.name + "'s turn");
+    }
 
-  startGame() {
-      this.socket.emit('startGame');
-  }
+    public chooseCard(card: Card) {
+        console.log(this.currentPlayer.name, ' chose ', card)
+    }
 
-  newDocument() {
-    this.socket.emit('addDoc', { id: this.docId(), doc: '' });
-  }
+    private deal(player: Player, numCardsToDeal: number) {
+        if ((player.getHandSize() + numCardsToDeal) > HAND_SIZE) {
+            return false;
+        }
+        for (let c = 0; c < numCardsToDeal; ++c) {
+            player.acceptCard(this.whiteDeck.draw());
+        }
+    }
 
-  editDocument(document: Document) {
-    this.socket.emit('editDoc', document);
-  }
+    public disconnect(player: Player) {
+        let deletedPlayer = this.players.splice(this.players.indexOf(player), 1);
+        delete deletedPlayer[0];
+        console.log(player.name + " left");
 
-  private docId() {
-    let text = 'this is private';
-    return text;
-  }
+        let morePeopleNeeded = MIN_PLAYERS - this.players.length;
+        if (morePeopleNeeded < 1) {
+            // this.title = "Ready when you are, friend."
+        } else if (morePeopleNeeded === 1) {
+            // this.title = "Please nab at least one more horrible person."
+        } else if (morePeopleNeeded > 1){
+            // this.title = "Please nab at least " + morePeopleNeeded + " more horrible people."
+        }
+    }
+
+    public connect(name: string) {
+        if (this.players.length >= MAX_PLAYERS) {
+            console.log("too many players");
+            // this.title = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
+            return false;
+        }
+
+        console.log(name + " joined");
+        var player = new Player(name);
+        this.players.push(player);
+        this.deal(player, HAND_SIZE);
+
+        let morePeopleNeeded = MIN_PLAYERS - this.players.length;
+        if (morePeopleNeeded < 1) {
+            // this.title = "Ready when you are, friend."
+        } else if (morePeopleNeeded === 1) {
+            // this.title = "Please nab at least one more horrible person."
+        } else if (morePeopleNeeded > 1){
+            // this.title = "Please nab at least " + morePeopleNeeded + " more horrible people."
+        }
+    }
 }
