@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
 import { Player } from './player';
 import { Card } from './card';
 import { Deck } from './deck';
@@ -22,7 +21,7 @@ export class GameService {
     public whiteDeck: Deck;
     public blackDeck: Deck;
 
-    constructor(private socket: Socket) { }
+    constructor() { }
 
     ngOnInit() {
         let blackCards = [];
@@ -43,7 +42,6 @@ export class GameService {
         } else {
             this.currentPlayer = this.players[0];
         }
-        this.socket.emit('startGame');
     }
 
     private nextTurn() {

@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 import { GameService } from 'src/app/game.service';
 import { Player } from 'src/app/player';
 import { Card } from 'src/app/card';
@@ -12,15 +11,19 @@ import { Card } from 'src/app/card';
 
 export class ControllerComponent {
     private player: Player;
+    @Input() public name: string;
     private gameService: GameService;
 
     constructor(player: Player, gameService: GameService) {
         this.player = player;
+        this.name = player.name;
         this.gameService = gameService;
     }
 
-    private setName(name: string) {
-        this.player.setName(name);
+    ngOnChanges(changes: SimpleChanges) {
+        if ('name' in changes) {
+            this.player.setName(changes['name'].currentValue);
+        }
     }
 
     private acceptCard(card: Card) {

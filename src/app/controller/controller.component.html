@@ -1,6 +1,6 @@
 <div id="hand">
     <div *ngFor="let card of player.cards"
-        [(ngModel)]="card.text"
+        [innerHtml]="card.text"
         [class]="card.color"
         class="card"
         (click)="playCard(card)">
@@ -8,7 +8,7 @@
 </div>
 
 <div id="status">
-    <h1>Score: <span [(ngModel)]="player.score"</h1>
-    <input name="name" type="text" id="name" autocorrect="off" spellcheck="false" [(ngModel)]="player.name" [(ngChange)]="setName(name)" />
+    <h1>Score: <span *ngModel="player.score"</h1>
+    <input name="name" type="text" id="name" autocorrect="off" spellcheck="false" *ngModel="name" />
     <button id="gameStarter" (click)="startGame()" [class.hidden]='isGameStarted'>Start Game</button>
 </div>
