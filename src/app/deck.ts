@@ -9,11 +9,11 @@ export class Deck {
         this.shuffle();
     }
 
-    public discard(card) {
+    public discard(card): void {
         this.cards.unshift(card);
     }
 
-    public draw() {
+    public draw(): Card {
         this.drawCount++;
         if (this.drawCount > this.cards.length) {
             this.shuffle();
@@ -22,7 +22,7 @@ export class Deck {
         return this.cards.pop();
     }
 
-    private shuffle() {
+    private shuffle(): void {
         // derived from https://github.com/Daplie/knuth-shuffle
         var currentIndex = this.cards.length,
             temporaryValue, randomIndex;

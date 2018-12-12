@@ -36,7 +36,7 @@ export class GameService {
         this.whiteDeck = new Deck(whiteCards);
     }
 
-    public startGame() {
+    public startGame(): void {
         if (this.players.length < MIN_PLAYERS) {
             alert("Not enough players.")
         } else {
@@ -44,7 +44,7 @@ export class GameService {
         }
     }
 
-    private nextTurn() {
+    private nextTurn(): void {
         // discard cards
         this.blackDeck.discard(this.blackCard);
         this.blackCard = undefined;
@@ -63,17 +63,27 @@ export class GameService {
         console.log("it's " + this.currentPlayer.name + "'s turn");
     }
 
-    public chooseCard(card: Card) {
+    public chooseCard(card: Card): void {
         console.log(this.currentPlayer.name, ' chose ', card)
     }
 
-    private deal(player: Player, numCardsToDeal: number) {
+    private deal(player: Player, numCardsToDeal: number): void {
         if ((player.getHandSize() + numCardsToDeal) > HAND_SIZE) {
-            return false;
+            throw new RangeError('exceeds hand size');
         }
         for (let c = 0; c < numCardsToDeal; ++c) {
             player.acceptCard(this.whiteDeck.draw());
         }
+    }
+
+    public playerExists(name: string): boolean {
+        for (let p = 0; p < this.players.length; ++p) {
+            let player: Player = this.players[p];
+            if (name === player.name) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public disconnect(player: Player) {
@@ -91,11 +101,10 @@ export class GameService {
         }
     }
 
-    public connect(name: string) {
+    public connect(name: string): Player {
         if (this.players.length >= MAX_PLAYERS) {
-            console.log("too many players");
             // this.title = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
-            return false;
+            throw new RangeError('too many players');
         }
 
         console.log(name + " joined");
@@ -111,5 +120,7 @@ export class GameService {
         } else if (morePeopleNeeded > 1){
             // this.title = "Please nab at least " + morePeopleNeeded + " more horrible people."
         }
+
+        return player;
     }
 }

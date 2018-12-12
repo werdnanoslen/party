@@ -11,8 +11,10 @@ import { Deck } from 'src/app/deck';
 })
 
 export class ScreenComponent {
-    playedBlackCard: Card;
-    playedWhiteCards: Card[];
+    public playedBlackCard: Card;
+    public playedWhiteCards: Card[];
+    public gameMessage: string = "Game screen goes here";
+;
 
     constructor(private gameService: GameService) { }
 }

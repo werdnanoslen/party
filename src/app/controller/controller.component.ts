@@ -15,30 +15,37 @@ export class ControllerComponent {
     private gameService: GameService;
 
     constructor(player: Player, gameService: GameService) {
-        this.player = player;
-        this.name = player.name;
         this.gameService = gameService;
+    }
+
+    ngOnInit () {
+        this.player = this.gameService.connect(this.name);
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if ('name' in changes) {
-            this.player.setName(changes['name'].currentValue);
+            let newName:string = changes['name'].currentValue
+            if (newName in this.gameService.players) {
+                console.log('this name is already taken');
+            } else {
+                this.player.setName(newName);
+            }
         }
     }
 
-    private acceptCard(card: Card) {
+    private acceptCard(card: Card): void {
         this.player.acceptCard(card);
     }
 
-    private playCard(card: Card) {
+    private playCard(card: Card): void {
         this.player.playCard(card);
     }
 
-    private chooseCard(card: Card) {
+    private chooseCard(card: Card): void {
         this.gameService.chooseCard(card);
     }
 
-    private startGame() {
+    private startGame(): void {
         this.gameService.startGame();
     }
 }
