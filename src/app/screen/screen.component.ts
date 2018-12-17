@@ -14,7 +14,7 @@ export class ScreenComponent {
     public playedBlackCard: Card;
     public playedWhiteCards: Card[];
     public gameMessage: string = "Game screen goes here";
-;
+    private table: string = "this is the table";
 
     constructor(private gameService: GameService) { }
 }

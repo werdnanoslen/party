@@ -4,7 +4,7 @@ import { AppComponent } from './app.component'
 import { ControllerComponent } from './controller/controller.component'
 import { ScreenComponent } from './screen/screen.component'
 
-const routes = [
+const routes: Routes = [
   { path: '', redirectTo: '/screen', pathMatch: 'full' },
   { path: 'screen', component: ScreenComponent },
   { path: 'controller', component: ControllerComponent }
@@ -15,3 +15,5 @@ const routes = [
   imports: [ RouterModule.forRoot(routes) ]
 })
 export class AppRoutingModule { }
+
+export const routingComponents = [ScreenComponent, ControllerComponent];

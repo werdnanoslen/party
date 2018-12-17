@@ -14,7 +14,7 @@ export class ControllerComponent {
     @Input() public name: string;
     private gameService: GameService;
 
-    constructor(player: Player, gameService: GameService) {
+    constructor(gameService: GameService) {
         this.gameService = gameService;
     }
 

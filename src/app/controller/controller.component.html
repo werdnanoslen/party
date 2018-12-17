@@ -8,7 +8,7 @@
 </div>
 
 <div id="status">
-    <h1>Score: <span *ngModel="player.score"</h1>
+    <h1>Score: <span *ngModel="player.score">0</span></h1>
     <input name="name" type="text" id="name" autocorrect="off" spellcheck="false" *ngModel="name" />
     <button id="gameStarter" (click)="startGame()" [class.hidden]='isGameStarted'>Start Game</button>
 </div>
