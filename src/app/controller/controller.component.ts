@@ -13,9 +13,11 @@ export class ControllerComponent {
     private player: Player;
     @Input() public name: string;
     private gameService: GameService;
+    public gameStarted: boolean;
 
     constructor(gameService: GameService) {
         this.gameService = gameService;
+        this.gameStarted = gameService.isGameStarted();
     }
 
     ngOnInit () {

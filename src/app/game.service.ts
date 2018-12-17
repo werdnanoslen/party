@@ -20,6 +20,9 @@ export class GameService {
     public blackCard: Card;
     public whiteDeck: Deck;
     public blackDeck: Deck;
+    public gameMessage: string = 'game is ready';
+    public gameStarted: boolean = false;
+    public screenReady: boolean = false;
 
     constructor() { }
 
@@ -36,11 +39,24 @@ export class GameService {
         this.whiteDeck = new Deck(whiteCards);
     }
 
+    public isGameStarted(): boolean {
+        return this.gameStarted;
+    }
+
+    public isScreenReady(): boolean {
+        return this.screenReady;
+    }
+
     public startGame(): void {
-        if (this.players.length < MIN_PLAYERS) {
-            alert("Not enough players.")
-        } else {
+        let morePeopleNeeded = MIN_PLAYERS - this.players.length;
+        if (morePeopleNeeded < 1) {
             this.currentPlayer = this.players[0];
+            this.gameStarted = true;
+            this.gameMessage = 'It\'s ', this.currentPlayer.name + '\'s turn';
+        } else if (morePeopleNeeded === 1) {
+            this.gameMessage = "Please nab at least one more horrible person."
+        } else if (morePeopleNeeded > 1){
+            this.gameMessage = "Please nab at least " + morePeopleNeeded + " more horrible people."
         }
     }
 
@@ -93,17 +109,17 @@ export class GameService {
 
         let morePeopleNeeded = MIN_PLAYERS - this.players.length;
         if (morePeopleNeeded < 1) {
-            // this.title = "Ready when you are, friend."
+            this.gameMessage = "Ready when you are, friend."
         } else if (morePeopleNeeded === 1) {
-            // this.title = "Please nab at least one more horrible person."
+            this.gameMessage = "Please nab at least one more horrible person."
         } else if (morePeopleNeeded > 1){
-            // this.title = "Please nab at least " + morePeopleNeeded + " more horrible people."
+            this.gameMessage = "Please nab at least " + morePeopleNeeded + " more horrible people."
         }
     }
 
     public connect(name: string): Player {
         if (this.players.length >= MAX_PLAYERS) {
-            // this.title = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
+            this.gameMessage = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
             throw new RangeError('too many players');
         }
 
@@ -114,11 +130,11 @@ export class GameService {
 
         let morePeopleNeeded = MIN_PLAYERS - this.players.length;
         if (morePeopleNeeded < 1) {
-            // this.title = "Ready when you are, friend."
+            this.gameMessage = "Ready when you are, friend."
         } else if (morePeopleNeeded === 1) {
-            // this.title = "Please nab at least one more horrible person."
+            this.gameMessage = "Please nab at least one more horrible person."
         } else if (morePeopleNeeded > 1){
-            // this.title = "Please nab at least " + morePeopleNeeded + " more horrible people."
+            this.gameMessage = "Please nab at least " + morePeopleNeeded + " more horrible people."
         }
 
         return player;

@@ -13,8 +13,14 @@ import { Deck } from 'src/app/deck';
 export class ScreenComponent {
     public playedBlackCard: Card;
     public playedWhiteCards: Card[];
-    public gameMessage: string = "Game screen goes here";
-    private table: string = "this is the table";
+    public gameService: GameService;
+    public gameMessage: string;
+    public table: string;
 
-    constructor(private gameService: GameService) { }
+    constructor(gameService: GameService) {
+        this.gameService = gameService;
+        this.gameMessage = gameService.gameMessage;
+        this.gameService.screenReady = true;
+        this.table = "table area";
+    }
 }
