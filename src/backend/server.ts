@@ -1,11 +1,15 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const ip = require('ip');
-const port = 5000;
-const url = ip.address() + ':' + port;
+import * as Express from 'express';
+import * as Http from 'http';
+import * as WebSocket from 'ws';
+import * as Ip from 'ip';
+import { Message } from '../models/message';
 
-let isGameStarted: boolean = false;
+const app = Express();
+const server = Http.createServer(app);
+const port = 5000;
+const wss = new WebSocket.Server({ server });
+const url = Ip.address() + ':' + port;
+
 let players = {
     'player-one': {
         score: 0,
@@ -13,15 +17,21 @@ let players = {
         cards: ['one', 'two', 'three']
     }
 };
-let playedCards = {};
 
-io.on('connection', socket => {
-    let previousId;
+wss.on('connection', function(socket) {
+    sendMessage({
+        from: 'SERVER',
+        data: 'new connection'
+    });
 
-    // socket.on('getScore', playerId => {
-    //     socket.emit('score', players[playerId][score]);
+    socket.on('message', (message: Message) => {
+        console.log('received message: ', message);
+    });
+
+    // socket.on('getScore', (playerId: string) => {
+    //     socket.send('score', players[playerId].score);
     // });
-    //
+
     // socket.on('getCards', playerId => {
     //     socket.emit('getHand', players[playerId][cards]);
     // })
@@ -55,17 +65,20 @@ io.on('connection', socket => {
     //     socket.to(doc.id).emit('document', doc);
     // });
 
-    io.emit('test');
+    function sendMessage(message: Message): void {
+        socket.send(JSON.stringify(message));
+        console.log('sent message: ', message);
+    }
 });
 
-app.get('/', (req, res) => {
-  if (!isGameStarted) {
-    isGameStarted = true;
-    console.log('sending game');
-    res.send('game');
-  } else {
-    console.log('sending controller');
-    res.send('controller');
-  }
-});
-http.listen(port, () => console.log('Express server running at', url));
+// app.get('/', (req, res) => {
+//   if (!isGameStarted) {
+//     isGameStarted = true;
+//     console.log('sending game');
+//     res.send('game');
+//   } else {
+//     console.log('sending controller');
+//     res.send('controller');
+//   }
+// });
+server.listen(port, () => console.log('Express server running at', url));
