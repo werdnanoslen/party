@@ -3,23 +3,23 @@ import * as Http from 'http';
 import * as WebSocket from 'ws';
 import * as Ip from 'ip';
 import { Message } from '../models/message';
+import { GameService } from './game.service';
 
 const app = Express();
 const server = Http.createServer(app);
 const port = 5000;
 const wss = new WebSocket.Server({ server });
 const url = Ip.address() + ':' + port;
-
-let players = {
-    'player-one': {
-        score: 0,
-        isTurn: 0,
-        cards: ['one', 'two', 'three']
-    }
-};
+const game = new GameService();
 
 app.get('/', function (req, res) {
-    res.send('hello');
+    let gameProps = Object.getOwnPropertyNames(game);
+    let properties = {};
+    for (var p=0; p<gameProps.length; ++p) {
+        let prop = gameProps[p];
+        properties[prop] = game[prop];
+    }
+    res.send(properties);
 })
 
 wss.on('connection', function(socket) {
@@ -32,6 +32,7 @@ wss.on('connection', function(socket) {
         let message: Message = JSON.parse(messageJSON);
         console.log('received message: ', message);
         if ('screen is ready' === message.data) {
+            game.screenReady = true;
             sendMessage({
                 from: 'SERVER',
                 data: 'screen is ready'

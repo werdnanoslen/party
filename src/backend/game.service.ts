@@ -19,9 +19,7 @@ export class GameService {
     public gameStarted: boolean = false;
     public screenReady: boolean = false;
 
-    constructor() { }
-
-    ngOnInit() {
+    constructor() {
         let blackCards = [];
         let whiteCards = [];
         for (let i = 0; i < WHITE_CARD_CONTENTS['cards'].length; ++i) {
@@ -32,14 +30,6 @@ export class GameService {
         }
         this.blackDeck = new Deck(blackCards);
         this.whiteDeck = new Deck(whiteCards);
-    }
-
-    public isGameStarted(): boolean {
-        return this.gameStarted;
-    }
-
-    public isScreenReady(): boolean {
-        return this.screenReady;
     }
 
     public startGame(): void {

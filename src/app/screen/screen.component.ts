@@ -22,7 +22,6 @@ export class ScreenComponent {
             console.log("screen.component received message: ", msg);
 		});
 
-        // this.gameMessage = gameService.gameMessage;
         this.sendMessage({
             from: 'APP',
             data: 'screen is ready'
