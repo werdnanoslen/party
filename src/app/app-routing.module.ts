@@ -3,18 +3,16 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component'
 import { ControllerComponent } from './controller/controller.component'
 import { ScreenComponent } from './screen/screen.component'
-import { CanActivateGuard } from './can-activate.guard'
 
 const routes: Routes = [
   { path: '', redirectTo: '/screen', pathMatch: 'full' },
-  { path: 'screen', component: ScreenComponent, canActivate: [CanActivateGuard] },
+  { path: 'screen', component: ScreenComponent },
   { path: 'controller', component: ControllerComponent }
-]
+];
 
 @NgModule({
   exports: [ RouterModule ],
-  imports: [ RouterModule.forRoot(routes) ],
-  providers: [ CanActivateGuard ]
+  imports: [ RouterModule.forRoot(routes) ]
 })
 export class AppRoutingModule { }
 

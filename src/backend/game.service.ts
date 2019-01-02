@@ -1,17 +1,12 @@
-import { Injectable } from '@angular/core';
-import { Player } from './player';
-import { Card } from './card';
-import { Deck } from './deck';
-import * as BLACK_CARD_CONTENTS from "src/assets/cards/core_bcards.json";
-import * as WHITE_CARD_CONTENTS from "src/assets/cards/core_wcards.json";
+import { Player } from '../models/player';
+import { Card } from '../models/card';
+import { Deck } from '../models/deck';
+import * as BLACK_CARD_CONTENTS from "../assets/cards/core_bcards.json";
+import * as WHITE_CARD_CONTENTS from "../assets/cards/core_wcards.json";
 
 const HAND_SIZE: number = 5;
 const MAX_PLAYERS: number = 12;
 const MIN_PLAYERS: number = 3;
-
-@Injectable({
-    providedIn: 'root'
-})
 
 export class GameService {
     public players: Player[] = [];

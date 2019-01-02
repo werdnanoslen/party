@@ -1,4 +1,4 @@
-import { Card } from 'src/app/card';
+import { Card } from './card';
 
 export class Player {
     public name: string = "anonymous";

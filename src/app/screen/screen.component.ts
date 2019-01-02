@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { GameService } from 'src/app/game.service';
-import { Player } from 'src/app/player';
-import { Card } from 'src/app/card';
-import { Deck } from 'src/app/deck';
+import { MessageService } from 'src/app/message.service';
+import { WebsocketService } from 'src/app/websocket.service';
+import { Card } from 'src/models/card';
+import { Player } from 'src/models/player';
+import { Message } from 'src/models/message';
 
 @Component({
     selector: 'app-screen',
@@ -13,14 +14,31 @@ import { Deck } from 'src/app/deck';
 export class ScreenComponent {
     public playedBlackCard: Card;
     public playedWhiteCards: Card[];
-    public gameService: GameService;
     public gameMessage: string;
     public table: string;
 
-    constructor(gameService: GameService) {
-        this.gameService = gameService;
-        this.gameMessage = gameService.gameMessage;
-        this.gameService.screenReady = true;
+    constructor(private messageService: MessageService) {
+        messageService.messages.subscribe(msg => {
+            console.log("screen.component received message: ", msg);
+		});
+
+        // this.gameMessage = gameService.gameMessage;
+        this.sendMessage({
+            from: 'APP',
+            data: 'screen is ready'
+        })
         this.table = "table area";
+    }
+
+    private sendMessage(message: Message) {
+        this.messageService.messages.next(message);
+        console.log('sent message: ', message);
+    }
+
+    public sendTestMessage() {
+        this.sendMessage({
+            from: 'APP',
+            data: 'screen is ready'
+        })
     }
 }

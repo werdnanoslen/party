@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
-import { GameService } from 'src/app/game.service';
-import { Player } from 'src/app/player';
-import { Card } from 'src/app/card';
+// import { GameService } from 'src/app/game.service';
+import { Card } from 'src/models/card';
+import { Player } from 'src/models/player';
 
 @Component({
     selector: 'app-controller',
@@ -10,28 +10,25 @@ import { Card } from 'src/app/card';
 })
 
 export class ControllerComponent {
-    private player: Player;
     @Input() public name: string;
-    private gameService: GameService;
+    private player: Player;
+    // private gameService: GameService;
     public gameStarted: boolean;
 
-    constructor(gameService: GameService) {
-        this.gameService = gameService;
-        this.gameStarted = gameService.isGameStarted();
-    }
-
-    ngOnInit () {
-        this.player = this.gameService.connect(this.name);
+    constructor(/*gameService: GameService*/) {
+        // this.gameService = gameService;
+        // this.gameStarted = gameService.isGameStarted();
+        // this.player = this.gameService.connect(this.name);
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if ('name' in changes) {
             let newName:string = changes['name'].currentValue
-            if (newName in this.gameService.players) {
-                console.log('this name is already taken');
-            } else {
-                this.player.setName(newName);
-            }
+            // if (newName in this.gameService.players) {
+            //     console.log('this name is already taken');
+            // } else {
+            //     this.player.setName(newName);
+            // }
         }
     }
 
@@ -44,10 +41,10 @@ export class ControllerComponent {
     }
 
     private chooseCard(card: Card): void {
-        this.gameService.chooseCard(card);
+        // this.gameService.chooseCard(card);
     }
 
     private startGame(): void {
-        this.gameService.startGame();
+        // this.gameService.startGame();
     }
 }

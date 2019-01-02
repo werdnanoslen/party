@@ -1,4 +1,4 @@
-import { Player } from 'src/app/player';
+import { Player } from './player';
 
 export class Card {
     public readonly text: string;

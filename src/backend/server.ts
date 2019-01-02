@@ -18,14 +18,25 @@ let players = {
     }
 };
 
+app.get('/', function (req, res) {
+    res.send('hello');
+})
+
 wss.on('connection', function(socket) {
     sendMessage({
         from: 'SERVER',
         data: 'new connection'
     });
 
-    socket.on('message', (message: Message) => {
+    socket.on('message', (messageJSON: string) => {
+        let message: Message = JSON.parse(messageJSON);
         console.log('received message: ', message);
+        if ('screen is ready' === message.data) {
+            sendMessage({
+                from: 'SERVER',
+                data: 'screen is ready'
+            })
+        }
     });
 
     // socket.on('getScore', (playerId: string) => {
