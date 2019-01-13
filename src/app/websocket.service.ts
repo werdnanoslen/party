@@ -19,6 +19,17 @@ export class WebsocketService {
         return this.subject;
     }
 
+    private sendMessage(ws: WebSocket, data: Object): void {
+        console.log("waiting for connection...")
+        setTimeout(() => {
+            if (ws.readyState === 1) {
+                ws.send(JSON.stringify(data));
+            } else {
+                this.sendMessage(ws, data);
+            }
+        }, 5);
+    }
+
     private create(url): Subject<MessageEvent> {
         let ws = new WebSocket(url);
 
@@ -31,9 +42,7 @@ export class WebsocketService {
             })
         let observer = {
             next: (data: Object) => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify(data));
-                }
+                this.sendMessage(ws, data);
             }
         }
         return Subject.create(observer, observable);
