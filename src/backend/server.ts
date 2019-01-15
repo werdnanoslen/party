@@ -33,7 +33,7 @@ wss.on('connection', function(socket) {
         console.log('received message: ', message);
         if ('screen is ready' === message.data) {
             game.screenReady = true;
-            sendMessage({
+            broadcastMessage({
                 from: 'SERVER',
                 data: 'screen is ready'
             })
@@ -80,6 +80,15 @@ wss.on('connection', function(socket) {
     function sendMessage(message: Message): void {
         socket.send(JSON.stringify(message));
         console.log('sent message: ', message);
+    }
+
+    function broadcastMessage(message: Message): void {
+        wss.clients.forEach(function each(client) {
+            if (client.readyState == WebSocket.OPEN) {
+                client.send(JSON.stringify(message));
+            }
+        });
+        console.log('broadcasted message: ', message);
     }
 });
 
