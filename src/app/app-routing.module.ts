@@ -5,7 +5,7 @@ import { ControllerComponent } from './controller/controller.component'
 import { ScreenComponent } from './screen/screen.component'
 
 const routes: Routes = [
-  { path: '', redirectTo: '/screen', pathMatch: 'full' },
+  { path: '', component: AppComponent },
   { path: 'screen', component: ScreenComponent },
   { path: 'controller', component: ControllerComponent }
 ];
