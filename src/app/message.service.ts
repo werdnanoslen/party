@@ -1,20 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { WebsocketService } from './websocket.service';
+import { webSocket } from 'rxjs/webSocket';
+import { Subject } from 'rxjs';
 import { Message } from '../models/message';
 
 const BACKEND_URL = 'ws://localhost:5000/';
 
 @Injectable()
 export class MessageService {
-	public messages: Subject<Message>;
+    public subject = webSocket(BACKEND_URL);
 
-	constructor(wss: WebsocketService) {
-		this.messages = <Subject<Message>>wss
-			.connect(BACKEND_URL)
-			.pipe(map((messageEvent: MessageEvent): Message => {
-				return JSON.parse(messageEvent.data);
-			}));
+	constructor() {
+        this.subject.subscribe(
+            (msg) => console.log('message received: ', msg),
+            (err) => console.log(err),
+            () => console.log('complete')
+        );
 	}
+
+    public sendMessage (from: string, data: string): void {
+        let message: Message = {
+            from: from,
+            data: data
+        };
+        this.subject.next(message);
+    }
 }

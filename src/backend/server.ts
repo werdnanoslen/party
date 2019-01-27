@@ -12,6 +12,8 @@ const wss = new WebSocket.Server({ server });
 const url = Ip.address() + ':' + port;
 const game = new GameService();
 
+var sockets: WebSocket[] = [];
+
 app.get('/', function (req, res) {
     let gameProps = Object.getOwnPropertyNames(game);
     let properties = {};
@@ -23,20 +25,29 @@ app.get('/', function (req, res) {
 })
 
 wss.on('connection', function(socket) {
+    sockets.push(socket);
     sendMessage({
         from: 'SERVER',
-        data: 'new connection'
+        data: 'connection'
     });
 
     socket.on('message', (messageJSON: string) => {
         let message: Message = JSON.parse(messageJSON);
         console.log('received message: ', message);
-        if ('screen is ready' === message.data) {
-            game.screenReady = true;
-            broadcastMessage({
-                from: 'SERVER',
-                data: 'screen is ready'
-            })
+        switch (message.data) {
+            case 'screen is ready':
+                game.screenReady = true;
+                broadcastMessage({
+                    from: 'SERVER',
+                    data: 'screen is ready'
+                });
+                break;
+            default:
+                sendMessage({
+                    from: 'SERVER',
+                    data: 'idklol'
+                })
+                break;
         }
     });
 

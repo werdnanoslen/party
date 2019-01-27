@@ -7,7 +7,6 @@ import { AppRoutingModule, routingComponents } from './app-routing.module';
 import { ControllerComponent } from './controller/controller.component';
 import { ScreenComponent } from './screen/screen.component';
 import { MessageService } from './message.service';
-import { WebsocketService } from './websocket.service';
 
 @NgModule({
   declarations: [
@@ -20,7 +19,7 @@ import { WebsocketService } from './websocket.service';
     AppRoutingModule,
     FormsModule
   ],
-  providers: [ MessageService, WebsocketService ],
-  bootstrap: [AppComponent]
+  providers: [ MessageService ],
+  bootstrap: [ AppComponent ]
 })
 export class AppModule { }
