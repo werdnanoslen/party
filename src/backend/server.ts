@@ -26,10 +26,11 @@ app.get('/', function (req, res) {
 
 wss.on('connection', function(socket) {
     sockets.push(socket);
+    let uiType = (1 === sockets.length) ? 'screen': 'controller';
     sendMessage({
         from: 'SERVER',
-        data: 'connection'
-    });
+        data: 'hello ' + uiType
+    })
 
     socket.on('message', (messageJSON: string) => {
         let message: Message = JSON.parse(messageJSON);

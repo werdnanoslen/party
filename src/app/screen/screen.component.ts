@@ -21,6 +21,6 @@ export class ScreenComponent {
     }
 
     public sendTestMessage() {
-        this.messageService.sendMessage('APP', 'screen is ready');
+        this.messageService.sendMessage('APP', 'test');
     }
 }
