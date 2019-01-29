@@ -102,14 +102,14 @@ export class GameService {
         }
     }
 
-    public connect(name: string): Player {
+    public connect(name?: string): Player {
         if (this.players.length >= MAX_PLAYERS) {
             this.gameMessage = "Sorry " + name + ", I think we have all our <em>real</em> friends here, don't you? Somebody press start already..."
             throw new RangeError('too many players');
         }
 
-        console.log(name + " joined");
         var player = new Player(name);
+        console.log(player.name + " joined");
         this.players.push(player);
         this.deal(player, HAND_SIZE);
 

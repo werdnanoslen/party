@@ -4,6 +4,7 @@ import * as WebSocket from 'ws';
 import * as Ip from 'ip';
 import { Message } from '../models/message';
 import { GameService } from './game.service';
+import { Player } from '../models/player';
 
 const app = Express();
 const server = Http.createServer(app);
@@ -12,11 +13,11 @@ const wss = new WebSocket.Server({ server });
 const url = Ip.address() + ':' + port;
 const game = new GameService();
 
-var sockets: WebSocket[] = [];
+var screenSocket: WebSocket;
+var properties = {};
 
 app.get('/', function (req, res) {
     let gameProps = Object.getOwnPropertyNames(game);
-    let properties = {};
     for (var p=0; p<gameProps.length; ++p) {
         let prop = gameProps[p];
         properties[prop] = game[prop];
@@ -24,13 +25,38 @@ app.get('/', function (req, res) {
     res.send(properties);
 })
 
-wss.on('connection', function(socket) {
-    sockets.push(socket);
-    let uiType = (1 === sockets.length) ? 'screen': 'controller';
-    sendMessage({
-        from: 'SERVER',
-        data: 'hello ' + uiType
-    })
+wss.on('connection', function(socket: WebSocket) {
+    if (undefined === screenSocket || socket === screenSocket) {
+        screenSocket = socket;
+        game.screenReady = true;
+        sendMessage({
+            from: 'SERVER',
+            data: 'hello screen'
+        });
+    } else {
+        //TODO: why is this undefined? It's all I need to make token exchange work :(
+        console.log(socket.url);
+        let player: Player = game.connect();
+        sendMessage({
+            from: 'SERVER',
+            data: 'hello ' + player.name
+        });
+    }
+
+    socket.on('disconnect', function() {
+        console.log('Got disconnect!');
+        if (socket === screenSocket) {
+            screenSocket = undefined;
+            game.screenReady = false;
+        } else {
+            for (var p=0; p<properties['players'].length; ++p) {
+                let player: Player = properties['players'][p];
+                if (socket === player.getSocket()) {
+                    game.disconnect(player)
+                }
+            }
+        }
+    });
 
     socket.on('message', (messageJSON: string) => {
         let message: Message = JSON.parse(messageJSON);
@@ -52,43 +78,6 @@ wss.on('connection', function(socket) {
         }
     });
 
-    // socket.on('getScore', (playerId: string) => {
-    //     socket.send('score', players[playerId].score);
-    // });
-
-    // socket.on('getCards', playerId => {
-    //     socket.emit('getHand', players[playerId][cards]);
-    // })
-    //
-    // socket.on('playCard', playerId, card => {
-    //     playedCards[playerId] = card;
-    //     socket.emit('playCard', playedCards);
-    // })
-    //
-    // socket.on('isTurn', playerId => {
-    //     socket.emit('isTurn', players[playerId][isTurn]);
-    // })
-    //
-    // socket.on('isGameStarted', data => {
-    //     socket.emit('isGameStarted', isGameStarted);
-    // })
-    //
-    // socket.on('startGame', data => {
-    //     gameStarted = true;
-    //     socket.emit('startGame', isGameStarted);
-    // })
-    //
-    // socket.on('addDoc', doc => {
-    //     documents[doc.id] = doc;
-    //     io.emit('documents', Object.keys(documents));
-    //     socket.emit('document', doc);
-    // });
-    //
-    // socket.on('editDoc', doc => {
-    //     documents[doc.id] = doc;
-    //     socket.to(doc.id).emit('document', doc);
-    // });
-
     function sendMessage(message: Message): void {
         socket.send(JSON.stringify(message));
         console.log('sent message: ', message);
@@ -104,14 +93,4 @@ wss.on('connection', function(socket) {
     }
 });
 
-// app.get('/', (req, res) => {
-//   if (!isGameStarted) {
-//     isGameStarted = true;
-//     console.log('sending game');
-//     res.send('game');
-//   } else {
-//     console.log('sending controller');
-//     res.send('controller');
-//   }
-// });
 server.listen(port, () => console.log('Express server running at', url));

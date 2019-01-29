@@ -1,12 +1,15 @@
 import { Card } from './card';
 
 export class Player {
-    public name: string = "anonymous";
+    public name: string = "anonymous" + Date.now();
     public points: number = 0;
+    private socket;
     private cards: Card[] = [];
 
     constructor (name?: string) {
-        this.name = name;
+        if (undefined !== name) {
+            this.name = name;
+        }
     }
 
     public acceptCard(card: Card): void {
@@ -19,6 +22,10 @@ export class Player {
 
     public playCard(card: Card): void {
         // TODO
+    }
+
+    public getSocket() {
+        return this.socket;
     }
 
     public setName(name): void {
