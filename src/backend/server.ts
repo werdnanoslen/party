@@ -26,6 +26,7 @@ app.get('/', function (req, res) {
 })
 
 wss.on('connection', function(socket: WebSocket) {
+    // let name = socket.upgradeReq.url;
     if (undefined === screenSocket || socket === screenSocket) {
         screenSocket = socket;
         game.screenReady = true;
@@ -34,8 +35,6 @@ wss.on('connection', function(socket: WebSocket) {
             data: 'hello screen'
         });
     } else {
-        //TODO: why is this undefined? It's all I need to make token exchange work :(
-        console.log(socket.url);
         let player: Player = game.connect();
         sendMessage({
             from: 'SERVER',
@@ -43,14 +42,14 @@ wss.on('connection', function(socket: WebSocket) {
         });
     }
 
-    socket.on('disconnect', function() {
+    socket.on('close', function() {
         console.log('Got disconnect!');
         if (socket === screenSocket) {
             screenSocket = undefined;
             game.screenReady = false;
         } else {
-            for (var p=0; p<properties['players'].length; ++p) {
-                let player: Player = properties['players'][p];
+            for (var p = 0; p < game.players.length; ++p) {
+                let player: Player = game.players[p];
                 if (socket === player.getSocket()) {
                     game.disconnect(player)
                 }
