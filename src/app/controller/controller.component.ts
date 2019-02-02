@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 // import { GameService } from 'src/app/game.service';
 import { Card } from 'src/models/card';
 import { Player } from 'src/models/player';
+import { MessageService } from '../message.service'
 
 @Component({
     selector: 'app-controller',
@@ -15,7 +16,7 @@ export class ControllerComponent {
     // private gameService: GameService;
     public gameStarted: boolean;
 
-    constructor(/*gameService: GameService*/) {
+    constructor(private messageService: MessageService/*gameService: GameService*/) {
         // this.gameService = gameService;
         // this.gameStarted = gameService.isGameStarted();
         // this.player = this.gameService.connect(this.name);

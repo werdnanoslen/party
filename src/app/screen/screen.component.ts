@@ -14,10 +14,8 @@ export class ScreenComponent {
     public playedWhiteCards: Card[];
     public gameMessage: string;
     public table: string;
-    private messageService: MessageService;
 
-    constructor() {
-        this.messageService = new MessageService();
+    constructor(private messageService: MessageService) {
     }
 
     public sendTestMessage() {

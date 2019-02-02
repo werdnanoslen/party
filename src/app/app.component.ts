@@ -11,10 +11,8 @@ import { MessageService } from './message.service';
 
 export class AppComponent {
     public title: string = "Cards Against Humanity";
-    private messageService: MessageService;
 
-    constructor(private router: Router) {
-        this.messageService = new MessageService();
+    constructor(private messageService: MessageService, private router: Router) {
         this.messageService.subject.subscribe((msg: Message) => {
             if ('hello screen' === msg.data) {
                 this.router.navigate(['/screen']);
