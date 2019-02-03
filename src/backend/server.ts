@@ -30,15 +30,11 @@ wss.on('connection', function(socket: WebSocket) {
     if (undefined === screenSocket || socket === screenSocket) {
         screenSocket = socket;
         game.screenReady = true;
-        sendMessage({
-            from: 'SERVER',
-            data: 'hello screen'
-        });
+        sendMessage('screenConnected');
     } else {
         let player: Player = game.connect();
-        sendMessage({
-            from: 'SERVER',
-            data: 'hello ' + player.name
+        sendMessage('playerConnected', {
+            name: player.name
         });
     }
 
@@ -47,11 +43,14 @@ wss.on('connection', function(socket: WebSocket) {
         if (socket === screenSocket) {
             screenSocket = undefined;
             game.screenReady = false;
+            console.log('screen disconnected')
         } else {
             for (var p = 0; p < game.players.length; ++p) {
                 let player: Player = game.players[p];
                 if (socket === player.getSocket()) {
-                    game.disconnect(player)
+                    game.disconnect(player);
+                    console.log('player ' + player.name + ' disconnected');
+                    break;
                 }
             }
         }
@@ -60,35 +59,39 @@ wss.on('connection', function(socket: WebSocket) {
     socket.on('message', (messageJSON: string) => {
         let message: Message = JSON.parse(messageJSON);
         console.log('received message: ', message);
-        switch (message.data) {
-            case 'screen is ready':
+        switch (message.command) {
+            case 'screenReady':
                 game.screenReady = true;
-                broadcastMessage({
-                    from: 'SERVER',
-                    data: 'screen is ready'
-                });
+                broadcastMessage('screenReady');
                 break;
             default:
-                sendMessage({
-                    from: 'SERVER',
-                    data: 'idklol'
-                })
+                sendMessage('test')
                 break;
         }
     });
 
-    function sendMessage(message: Message): void {
+    function sendMessage(command: string, data?: object): void {
+        let message: Message = toMessage(command, data);
         socket.send(JSON.stringify(message));
         console.log('sent message: ', message);
     }
 
-    function broadcastMessage(message: Message): void {
+    function broadcastMessage(command: string, data?: object): void {
+        let message: Message = toMessage(command, data);
         wss.clients.forEach(function each(client) {
             if (client.readyState == WebSocket.OPEN) {
                 client.send(JSON.stringify(message));
             }
         });
         console.log('broadcasted message: ', message);
+    }
+
+    function toMessage(command: string, data?: object): Message {
+        return {
+            command: command,
+            from: 'SERVER',
+            data: data
+        };
     }
 });
 

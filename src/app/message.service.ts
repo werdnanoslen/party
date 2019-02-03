@@ -16,10 +16,11 @@ export class MessageService {
         this.subject.subscribe(
             (msg: Message) => {
                 console.log('message received: ', msg);
-                let to = msg.data.split('hello ')[1];
-                if (undefined !== to) {
-                    this.from = to;
+                if (msg.command === 'playerConnected') {
+                    this.from = msg.data.name;
                     // sessionStorage.setItem('from', this.from);
+                } else if (msg.command === 'screenConnected') {
+                    this.from = 'SCREEN'
                 }
             },
             (err) => console.log(err),
@@ -27,11 +28,13 @@ export class MessageService {
         );
 	}
 
-    public sendMessage (data: string): void {
+    public sendMessage (command: string, data?: object): void {
         let message: Message = {
+            command: command,
             from: this.from,
             data: data
         };
         this.subject.next(message);
+        console.log('sent message: ', message)
     }
 }

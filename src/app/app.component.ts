@@ -14,9 +14,9 @@ export class AppComponent {
 
     constructor(private messageService: MessageService, private router: Router) {
         this.messageService.subject.subscribe((msg: Message) => {
-            if ('hello screen' === msg.data) {
+            if (msg.command === 'screenConnected') {
                 this.router.navigate(['/screen']);
-            } else {
+            } else if (msg.command === 'playerConnected'){
                 this.router.navigate(['/controller']);
             }
         });
