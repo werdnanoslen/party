@@ -87,6 +87,14 @@ export class GameService {
         return false;
     }
 
+    public getPlayer(name: string): Player {
+        for (let p in this.players) {
+            if (this.players[p].name === name) {
+                return this.players[p];
+            }
+        }
+    }
+
     public disconnect(player: Player) {
         let deletedPlayer = this.players.splice(this.players.indexOf(player), 1);
         delete deletedPlayer[0];

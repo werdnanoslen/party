@@ -34,7 +34,7 @@ wss.on('connection', function(socket: WebSocket) {
     } else {
         let player: Player = game.connect();
         sendMessage('playerConnected', {
-            name: player.name
+            player: player
         });
     }
 
@@ -63,6 +63,13 @@ wss.on('connection', function(socket: WebSocket) {
             case 'screenReady':
                 game.screenReady = true;
                 broadcastMessage('screenReady');
+                break;
+            case 'getPlayer':
+                let name: string = message.from;
+                let player: Player = game.getPlayer(name);
+                sendMessage('getPlayer', {
+                    player: player
+                })
                 break;
             default:
                 sendMessage('test')

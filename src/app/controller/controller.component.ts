@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 // import { GameService } from 'src/app/game.service';
 import { Card } from 'src/models/card';
 import { Player } from 'src/models/player';
+import { Message } from 'src/models/message';
 import { MessageService } from '../message.service'
 
 @Component({
@@ -20,6 +21,12 @@ export class ControllerComponent {
         // this.gameService = gameService;
         // this.gameStarted = gameService.isGameStarted();
         // this.player = this.gameService.connect(this.name);
+        this.messageService.sendMessage('getPlayer');
+        this.messageService.subject.subscribe((msg: Message) => {
+            if (msg.command === 'playerConnected' || msg.command === 'getPlayer') {
+                this.player = msg.data.player;
+            }
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
