@@ -14,15 +14,19 @@ const url = Ip.address() + ':' + port;
 const game = new GameService();
 
 var screenSocket: WebSocket;
-var properties = {};
+
+function getGameStatus(): object {
+    let gameProps: object = {};
+    let propNames: string[] = Object.getOwnPropertyNames(game);
+    for (var p in propNames) {
+        let propName = propNames[p];
+        gameProps[propName] = game[propName];
+    }
+    return gameProps;
+}
 
 app.get('/', function (req, res) {
-    let gameProps = Object.getOwnPropertyNames(game);
-    for (var p=0; p<gameProps.length; ++p) {
-        let prop = gameProps[p];
-        properties[prop] = game[prop];
-    }
-    res.send(properties);
+    res.send(getGameStatus());
 })
 
 wss.on('connection', function(socket: WebSocket) {
@@ -36,6 +40,7 @@ wss.on('connection', function(socket: WebSocket) {
         sendMessage('playerConnected', {
             player: player
         });
+        sendMessage('getGameStatus', {status: getGameStatus()}, [screenSocket]);
     }
 
     socket.on('close', function() {
@@ -53,6 +58,7 @@ wss.on('connection', function(socket: WebSocket) {
                     break;
                 }
             }
+            sendMessage('getGameStatus', {status: getGameStatus()}, [screenSocket]);
         }
     });
 
@@ -71,15 +77,25 @@ wss.on('connection', function(socket: WebSocket) {
                     player: player
                 })
                 break;
+            case 'getGameStatus':
+                sendMessage('getGameStatus', {
+                    status: getGameStatus()
+                });
             default:
                 sendMessage('test')
                 break;
         }
     });
 
-    function sendMessage(command: string, data?: object): void {
+    function sendMessage(command: string, data?: object, to?: WebSocket[]): void {
         let message: Message = toMessage(command, data);
-        socket.send(JSON.stringify(message));
+        if (to) {
+            for (let s in to) {
+                to[s].send(JSON.stringify(message));
+            }
+        } else {
+            socket.send(JSON.stringify(message));
+        }
         console.log('sent message: ', message);
     }
 
