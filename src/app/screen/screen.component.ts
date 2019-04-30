@@ -15,17 +15,21 @@ export class ScreenComponent {
     public playedWhiteCards: Card[];
     public gameMessage: string;
     public table: string;
-    private gameStatus: object = {};
+    private gameStatus: any;
 
     constructor(private messageService: MessageService) {
+        this.gameMessage = "0 players connected";
         this.messageService.subject.subscribe((msg: Message) => {
             switch (msg.command) {
                 case 'playerConnected':
                     this.messageService.sendMessage('getGameStatus');
                     break;
                 case 'getGameStatus':
-                    this.gameStatus = msg.data.status;
+                    this.gameStatus = msg.data;
                     this.gameMessage = this.gameStatus.players.length + ' players connected';
+                    break;
+                case 'screenConnected':
+                    console.log('the screen is ready');
                     break;
                 default:
                     console.log('unknown message: ', msg.data);

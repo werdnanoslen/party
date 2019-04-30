@@ -37,10 +37,8 @@ wss.on('connection', function(socket: WebSocket) {
         sendMessage('screenConnected');
     } else {
         let player: Player = game.connect();
-        sendMessage('playerConnected', {
-            player: player
-        });
-        sendMessage('getGameStatus', {status: getGameStatus()}, [screenSocket]);
+        sendMessage('playerConnected', player);
+        sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
     }
 
     socket.on('close', function() {
@@ -58,7 +56,7 @@ wss.on('connection', function(socket: WebSocket) {
                     break;
                 }
             }
-            sendMessage('getGameStatus', {status: getGameStatus()}, [screenSocket]);
+            sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
         }
     });
 
@@ -73,16 +71,13 @@ wss.on('connection', function(socket: WebSocket) {
             case 'getPlayer':
                 let name: string = message.from;
                 let player: Player = game.getPlayer(name);
-                sendMessage('getPlayer', {
-                    player: player
-                })
+                sendMessage('getPlayer', player);
                 break;
             case 'getGameStatus':
-                sendMessage('getGameStatus', {
-                    status: getGameStatus()
-                });
+                sendMessage('getGameStatus', getGameStatus());
+                break;
             default:
-                sendMessage('test')
+                sendMessage('test');
                 break;
         }
     });

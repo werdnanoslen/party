@@ -17,7 +17,7 @@ export class MessageService {
             (msg: Message) => {
                 console.log('received message: ', msg);
                 if (msg.command === 'playerConnected') {
-                    this.from = msg.data.player.name;
+                    this.from = msg.data.name;
                     // sessionStorage.setItem('from', this.from);
                 } else if (msg.command === 'screenConnected') {
                     this.from = 'SCREEN'

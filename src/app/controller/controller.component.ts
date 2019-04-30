@@ -24,7 +24,7 @@ export class ControllerComponent {
         this.messageService.sendMessage('getPlayer');
         this.messageService.subject.subscribe((msg: Message) => {
             if (msg.command === 'playerConnected' || msg.command === 'getPlayer') {
-                this.player = msg.data.player;
+                this.player = msg.data;
             }
         });
     }
