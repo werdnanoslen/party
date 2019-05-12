@@ -32,7 +32,7 @@ export class ScreenComponent {
                     console.log('the screen is ready');
                     break;
                 default:
-                    console.log('unknown message: ', msg.data);
+                    console.log('unhandled message: ', msg);
                     break;
             }
         });

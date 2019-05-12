@@ -23,8 +23,16 @@ export class ControllerComponent {
         // this.player = this.gameService.connect(this.name);
         // this.messageService.sendMessage('getPlayer');
         this.messageService.subject.subscribe((msg: Message) => {
-            if (msg.command === 'playerConnected' || msg.command === 'getPlayer') {
-                this.player = msg.data;
+            switch (msg.command) {
+                case 'playerConnected':
+                    this.player = msg.data;
+                    break;
+                case 'getPlayer':
+                    this.player = msg.data;
+                    break;
+                default:
+                    console.log('unhandled message: ', msg);
+                    break;
             }
         });
     }

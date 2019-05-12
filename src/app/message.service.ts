@@ -17,7 +17,6 @@ export class MessageService {
         this.subject = webSocket(url);
         this.subject.subscribe(
             (msg: Message) => {
-                console.log('received message: ', msg);
                 if (msg.command === 'screenConnected') {
                     this.from = 'SCREEN';
                     localStorage.setItem('from', this.from);
@@ -27,7 +26,7 @@ export class MessageService {
                 }
             },
             (err) => console.log(err),
-            () => console.log('complete')
+            () => console.log('message service ready')
         );
 	}
 
