@@ -8,19 +8,23 @@ const BACKEND_URL = 'ws://localhost:5000/';
 @Injectable()
 export class MessageService {
     public subject: Subject<Message>;
-    public from: string;// = sessionStorage.getItem('from');
+    public from: string;
 
 	constructor() {
-        let url = BACKEND_URL;// + (this.from !== undefined ? this.from : '');
+        let from = localStorage.getItem('from');
+        this.from = (from === null) ? '' : from;
+        let url = BACKEND_URL + this.from;
+        console.log('url: ', url);
         this.subject = webSocket(url);
         this.subject.subscribe(
             (msg: Message) => {
                 console.log('received message: ', msg);
-                if (msg.command === 'playerConnected') {
+                if (msg.command === 'screenConnected') {
+                    this.from = 'SCREEN';
+                    localStorage.setItem('from', this.from);
+                } else if (msg.command === 'playerConnected') {
                     this.from = msg.data.name;
-                    // sessionStorage.setItem('from', this.from);
-                } else if (msg.command === 'screenConnected') {
-                    this.from = 'SCREEN'
+                    localStorage.setItem('from', this.from);
                 }
             },
             (err) => console.log(err),

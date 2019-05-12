@@ -30,13 +30,13 @@ app.get('/', function (req, res) {
 })
 
 wss.on('connection', function(socket: WebSocket) {
-    // let name = socket.upgradeReq.url;
+    let name: string = socket['upgradeReq'].url.substring(1); //omits the leading slash
     if (undefined === screenSocket || socket === screenSocket) {
         screenSocket = socket;
         game.screenReady = true;
         sendMessage('screenConnected');
     } else {
-        let player: Player = game.connect();
+        let player: Player = game.connect(name);
         sendMessage('playerConnected', player);
         sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
     }
@@ -91,7 +91,7 @@ wss.on('connection', function(socket: WebSocket) {
         } else {
             socket.send(JSON.stringify(message));
         }
-        console.log('sent message: ', message);
+        console.log('sent message: ', message.command);
     }
 
     function broadcastMessage(command: string, data?: object): void {

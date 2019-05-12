@@ -116,10 +116,15 @@ export class GameService {
             throw new RangeError('too many players');
         }
 
-        var player = new Player(name);
+        let player: Player;
+        if (this.playerExists(name)) {
+            player = this.getPlayer(name);
+        } else {
+            player = new Player(name);
+            this.players.push(player);
+            this.deal(player, HAND_SIZE);
+        }
         console.log(player.name + " joined");
-        this.players.push(player);
-        this.deal(player, HAND_SIZE);
 
         let morePeopleNeeded = MIN_PLAYERS - this.players.length;
         if (morePeopleNeeded < 1) {

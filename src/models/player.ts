@@ -1,14 +1,16 @@
 import { Card } from './card';
 
 export class Player {
-    public name: string = "anonymous" + Date.now();
+    public name: string;
     public points: number = 0;
     private socket;
     private cards: Card[] = [];
 
     constructor (name?: string) {
-        if (undefined !== name) {
+        if (name) {
             this.name = name;
+        } else {
+            this.name = "anonymous" + Date.now();
         }
     }
 

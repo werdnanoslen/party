@@ -1,15 +1,16 @@
-<ng-container id="hand" *ngIf="player !== undefined">
+<ng-container>
     <div id="status">
         <input name="name" type="text" id="name" autocorrect="off" spellcheck="false" [(ngModel)]="player.name" />
         <h1>Score: <span>{{player.points}}</span></h1>
         <button id="gameStarter" (click)="startGame()" [class.hidden]='gameStarted'>Start Game</button>
     </div>
-
-    <div *ngFor="let card of player.cards"
-        (click)="playCard(card)"
-        class="card"
-        [class.black]="card.color === 'black'"
-        [class.white]="card.color === 'white'">
-        {{card.text}}
+    <div id="hand" *ngIf="player !== undefined">
+        <div *ngFor="let card of player.cards"
+            (click)="playCard(card)"
+            class="card"
+            [class.black]="card.color === 'black'"
+            [class.white]="card.color === 'white'">
+            {{card.text}}
+        </div>
     </div>
 </ng-container>
