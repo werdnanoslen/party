@@ -85,7 +85,7 @@ wss.on('connection', function(socket: WebSocket) {
                 sendMessage('getPlayer', game.getPlayer(newName));
                 break;
             default:
-                sendMessage('test');
+                broadcastMessage('test');
                 break;
         }
     });
