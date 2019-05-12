@@ -30,7 +30,7 @@ app.get('/', function (req, res) {
 })
 
 wss.on('connection', function(socket: WebSocket) {
-    let name: string = socket['upgradeReq'].url.substring(1); //omits the leading slash
+    let name: string = decodeURI(socket['upgradeReq'].url.substring(1));
     if (undefined === screenSocket || socket === screenSocket) {
         screenSocket = socket;
         game.screenReady = true;
@@ -75,6 +75,14 @@ wss.on('connection', function(socket: WebSocket) {
                 break;
             case 'getGameStatus':
                 sendMessage('getGameStatus', getGameStatus());
+                break;
+            case 'changeName':
+                let oldName: string = message.from;
+                let newName: string = message.data;
+                if (!game.playerExists(newName)) {
+                    game.getPlayer(oldName).name = newName;
+                }
+                sendMessage('getPlayer', game.getPlayer(newName));
                 break;
             default:
                 sendMessage('test');

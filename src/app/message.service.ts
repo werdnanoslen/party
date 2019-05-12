@@ -14,7 +14,6 @@ export class MessageService {
         let from = localStorage.getItem('from');
         this.from = (from === null) ? '' : from;
         let url = BACKEND_URL + this.from;
-        console.log('url: ', url);
         this.subject = webSocket(url);
         this.subject.subscribe(
             (msg: Message) => {
@@ -22,7 +21,7 @@ export class MessageService {
                 if (msg.command === 'screenConnected') {
                     this.from = 'SCREEN';
                     localStorage.setItem('from', this.from);
-                } else if (msg.command === 'playerConnected') {
+                } else if (msg.command === 'playerConnected' || msg.command === 'getPlayer') {
                     this.from = msg.data.name;
                     localStorage.setItem('from', this.from);
                 }
@@ -32,7 +31,7 @@ export class MessageService {
         );
 	}
 
-    public sendMessage (command: string, data?: object): void {
+    public sendMessage (command: string, data?: any): void {
         let message: Message = {
             command: command,
             from: this.from,

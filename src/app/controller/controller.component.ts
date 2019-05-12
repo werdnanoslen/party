@@ -29,15 +29,9 @@ export class ControllerComponent {
         });
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if ('name' in changes) {
-            let newName:string = changes['name'].currentValue
-            // if (newName in this.gameService.players) {
-            //     console.log('this name is already taken');
-            // } else {
-            //     this.player.setName(newName);
-            // }
-        }
+    private changeName(form: any) {
+        let newName:string = form.name;
+        this.messageService.sendMessage('changeName', newName);
     }
 
     private acceptCard(card: Card): void {
