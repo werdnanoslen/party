@@ -1,5 +1,5 @@
 <ng-container>
-    <div id="status">
+    <div id="status" *ngIf="undefined !== player">
         <form #form="ngForm" (ngSubmit)="changeName(form.value)">
             <input name="name" type="text" id="name" autocorrect="off" spellcheck="false" [(ngModel)]="player.name" />
             <button type="submit">Set</button>
