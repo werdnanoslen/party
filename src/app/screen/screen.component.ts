@@ -26,7 +26,7 @@ export class ScreenComponent {
                     break;
                 case 'getGameStatus':
                     this.gameStatus = msg.data;
-                    this.gameMessage = this.gameStatus.players.length + ' players connected';
+                    this.gameMessage = msg.data.gameMessage;
                     break;
                 case 'screenConnected':
                     console.log('the screen is ready');
