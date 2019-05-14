@@ -62,7 +62,7 @@ wss.on('connection', function(socket: WebSocket) {
 
     socket.on('message', (messageJSON: string) => {
         let message: Message = JSON.parse(messageJSON);
-        console.log('received message: ', message);
+        console.log('received message: ', message.command);
         switch (message.command) {
             case 'screenReady':
                 game.screenReady = true;
