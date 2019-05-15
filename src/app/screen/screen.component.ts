@@ -15,6 +15,7 @@ export class ScreenComponent {
     public playedWhiteCards: Card[];
     public gameMessage: string;
     public table: string;
+    private players: any;
     private gameStatus: any;
 
     constructor(private messageService: MessageService) {
@@ -27,6 +28,7 @@ export class ScreenComponent {
                 case 'getGameStatus':
                     this.gameStatus = msg.data;
                     this.gameMessage = msg.data.gameMessage;
+                    this.players = msg.data.players;
                     break;
                 case 'screenConnected':
                     console.log('the screen is ready');

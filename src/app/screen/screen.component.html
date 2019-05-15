@@ -1,3 +1,6 @@
 <p id="game-message" name="gameMessage">{{gameMessage}}</p>
+<ul id="players">
+    <li *ngFor="let player of players">{{player.name}}</li>
+</ul>
 <div id="table" [innerHtml]="table" name="table">[table area]</div>
 <button (click)="sendTestMessage()">Test</button>
