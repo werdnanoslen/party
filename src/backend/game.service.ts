@@ -93,11 +93,18 @@ export class GameService {
                 return this.players[p];
             }
         }
+        return null;
     }
 
-    public disconnect(player: Player) {
-        let deletedPlayer = this.players.splice(this.players.indexOf(player), 1);
-        delete deletedPlayer[0];
+    public disconnect(name: string) {
+        let player: Player = this.getPlayer(name);
+        if (null === player) {
+            console.error('no player by that name');
+            return;
+        }
+
+        let playerIndex = this.players.indexOf(player);
+        this.players.splice(playerIndex, 1);
         console.log(player.name + " left");
 
         let morePeopleNeeded = MIN_PLAYERS - this.players.length;

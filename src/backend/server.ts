@@ -14,6 +14,7 @@ const url = Ip.address() + ':' + port;
 const game = new GameService();
 
 var screenSocket: WebSocket;
+var sockets: {'name': string, 'socket': WebSocket}[] = [];
 
 function getGameStatus(): object {
     let gameProps: object = {};
@@ -37,27 +38,31 @@ wss.on('connection', function(socket: WebSocket) {
         sendMessage('screenConnected');
     } else {
         let player: Player = game.connect(name);
+        name = player.name;
         sendMessage('playerConnected', player);
         sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
     }
+    sockets.push({
+        'name': name,
+        'socket': socket
+    });
 
     socket.on('close', function() {
-        console.log('Got disconnect!');
-        if (socket === screenSocket) {
-            screenSocket = undefined;
-            game.screenReady = false;
-            console.log('screen disconnected')
-        } else {
-            for (var p = 0; p < game.players.length; ++p) {
-                let player: Player = game.players[p];
-                if (socket === player.getSocket()) {
-                    game.disconnect(player);
-                    console.log('player ' + player.name + ' disconnected');
-                    break;
+        let name: string;
+        for (let s=0; s<sockets.length; ++s) {
+            if (sockets[s].socket === socket) {
+                name = sockets[s].name;
+                sockets.splice(s, 1);
+                if (name === 'SCREEN') {
+                    game.screenReady = false;
+                } else {
+                    game.disconnect(name);
+                    sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
                 }
+                break;
             }
-            sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
         }
+        console.log(name || 'an unknown socket', ' disconnected');
     });
 
     socket.on('message', (messageJSON: string) => {
@@ -81,8 +86,15 @@ wss.on('connection', function(socket: WebSocket) {
                 let newName: string = message.data;
                 if (!game.playerExists(newName)) {
                     game.getPlayer(oldName).name = newName;
+                    for (let s=0; s<sockets.length; ++s) {
+                        if (sockets[s].name === oldName) {
+                            sockets[s].name = newName;
+                            break;
+                        }
+                    }
                 }
                 sendMessage('getPlayer', game.getPlayer(newName));
+                sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
                 break;
             default:
                 broadcastMessage('test');

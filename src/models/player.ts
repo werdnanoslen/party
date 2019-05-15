@@ -3,7 +3,6 @@ import { Card } from './card';
 export class Player {
     public name: string;
     public points: number = 0;
-    private socket;
     private cards: Card[] = [];
 
     constructor (name?: string) {
@@ -24,10 +23,6 @@ export class Player {
 
     public playCard(card: Card): void {
         // TODO
-    }
-
-    public getSocket() {
-        return this.socket;
     }
 
     public setName(name): void {
