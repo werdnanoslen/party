@@ -55,6 +55,7 @@ wss.on('connection', function(socket: WebSocket) {
                 sockets.splice(s, 1);
                 if (name === 'SCREEN') {
                     game.screenReady = false;
+                    screenSocket = undefined;
                 } else {
                     game.disconnect(name);
                     sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
@@ -62,7 +63,7 @@ wss.on('connection', function(socket: WebSocket) {
                 break;
             }
         }
-        console.log(name || 'an unknown socket', ' disconnected');
+        console.log(name || 'an unknown socket', 'disconnected');
     });
 
     socket.on('message', (messageJSON: string) => {
@@ -104,14 +105,18 @@ wss.on('connection', function(socket: WebSocket) {
 
     function sendMessage(command: string, data?: object, to?: WebSocket[]): void {
         let message: Message = toMessage(command, data);
-        if (to) {
-            for (let s in to) {
-                to[s].send(JSON.stringify(message));
+        try {
+            if (to) {
+                for (let s in to) {
+                    to[s].send(JSON.stringify(message));
+                }
+            } else {
+                socket.send(JSON.stringify(message));
             }
-        } else {
-            socket.send(JSON.stringify(message));
+            console.log('sent message: ', message.command);
+        } catch (error) {
+            console.error('could not send message: ', error);
         }
-        console.log('sent message: ', message.command);
     }
 
     function broadcastMessage(command: string, data?: object): void {
