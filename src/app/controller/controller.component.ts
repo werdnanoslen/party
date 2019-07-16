@@ -15,7 +15,8 @@ export class ControllerComponent {
     @Input() public name: string;
     private player: Player;
     // private gameService: GameService;
-    public gameStarted: boolean;
+    private gameStarted: boolean;
+    private gameReady: boolean;
 
     constructor(private messageService: MessageService/*gameService: GameService*/) {
         // this.gameService = gameService;
@@ -29,6 +30,9 @@ export class ControllerComponent {
                     break;
                 case 'getPlayer':
                     this.player = msg.data;
+                    break;
+                case 'gameReady':
+                    this.gameReady = msg.data;
                     break;
                 default:
                     console.log('unhandled message: ', msg);
@@ -55,6 +59,6 @@ export class ControllerComponent {
     }
 
     private startGame(): void {
-        // this.gameService.startGame();
+        this.messageService.sendMessage('startGame');
     }
 }

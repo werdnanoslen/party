@@ -41,6 +41,11 @@ wss.on('connection', function(socket: WebSocket) {
         name = player.name;
         sendMessage('playerConnected', player);
         sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
+        if (game.gameReady) {
+            broadcastMessage('gameReady', true);
+        } else {
+            broadcastMessage('gameReady', false);
+        }
     }
     sockets.push({
         'name': name,
@@ -59,6 +64,11 @@ wss.on('connection', function(socket: WebSocket) {
                 } else {
                     game.disconnect(name);
                     sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
+                    if (game.gameReady) {
+                        broadcastMessage('gameReady', true);
+                    } else {
+                        broadcastMessage('gameReady', false);
+                    }
                 }
                 break;
             }
@@ -97,13 +107,16 @@ wss.on('connection', function(socket: WebSocket) {
                 sendMessage('getPlayer', game.getPlayer(newName));
                 sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
                 break;
+            case 'startGame':
+                game.startGame();
+                break;
             default:
                 broadcastMessage('test');
                 break;
         }
     });
 
-    function sendMessage(command: string, data?: object, to?: WebSocket[]): void {
+    function sendMessage(command: string, data?: any, to?: WebSocket[]): void {
         let message: Message = toMessage(command, data);
         try {
             if (to) {
@@ -119,7 +132,7 @@ wss.on('connection', function(socket: WebSocket) {
         }
     }
 
-    function broadcastMessage(command: string, data?: object): void {
+    function broadcastMessage(command: string, data?: any): void {
         let message: Message = toMessage(command, data);
         wss.clients.forEach(function each(client) {
             if (client.readyState == WebSocket.OPEN) {

@@ -5,7 +5,7 @@
             <button type="submit">Set</button>
         </form>
         <h1>Score: <span>{{player.points}}</span></h1>
-        <button id="gameStarter" (click)="startGame()" [class.hidden]='gameStarted'>Start Game</button>
+        <button id="gameStarter" (click)="startGame()" [class.hidden]='gameStarted || !gameReady'>Start Game</button>
     </div>
     <div id="hand" *ngIf="player !== undefined" [class.hidden]='!gameStarted'>
         <div *ngFor="let card of player.cards"

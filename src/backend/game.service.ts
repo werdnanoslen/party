@@ -18,6 +18,7 @@ export class GameService {
     public gameMessage: string = 'game is ready';
     public gameStarted: boolean = false;
     public screenReady: boolean = false;
+    public gameReady: boolean = false;
 
     constructor() {
         let blackCards = [];
@@ -112,8 +113,10 @@ export class GameService {
             this.gameMessage = "Ready when you are, friend."
         } else if (morePeopleNeeded === 1) {
             this.gameMessage = "Please nab at least one more horrible person."
+            this.gameReady = false;
         } else if (morePeopleNeeded > 1){
             this.gameMessage = "Please nab at least " + morePeopleNeeded + " more horrible people."
+            this.gameReady = false;
         }
     }
 
@@ -136,6 +139,7 @@ export class GameService {
         let morePeopleNeeded = MIN_PLAYERS - this.players.length;
         if (morePeopleNeeded < 1) {
             this.gameMessage = "Ready when you are, friend."
+            this.gameReady = true;
         } else if (morePeopleNeeded === 1) {
             this.gameMessage = "Please nab at least one more horrible person."
         } else if (morePeopleNeeded > 1){
