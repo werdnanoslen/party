@@ -7,7 +7,7 @@
         <h1>Score: <span>{{player.points}}</span></h1>
         <button id="gameStarter" (click)="startGame()" [class.hidden]='gameStarted'>Start Game</button>
     </div>
-    <div id="hand" *ngIf="player !== undefined">
+    <div id="hand" *ngIf="player !== undefined" [class.hidden]='!gameStarted'>
         <div *ngFor="let card of player.cards"
             (click)="playCard(card)"
             class="card"
