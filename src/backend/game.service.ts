@@ -38,7 +38,7 @@ export class GameService {
         if (morePeopleNeeded < 1) {
             this.currentPlayer = this.players[0];
             this.gameStarted = true;
-            this.gameMessage = 'It\'s ', this.currentPlayer.name + '\'s turn';
+            this.gameMessage = 'It\'s ' + this.currentPlayer.name + '\'s turn';
         } else if (morePeopleNeeded === 1) {
             this.gameMessage = "Please nab at least one more horrible person."
         } else if (morePeopleNeeded > 1){
