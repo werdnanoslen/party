@@ -13,8 +13,7 @@ const wss = new WebSocket.Server({ server });
 const url = Ip.address() + ':' + port;
 const game = new GameService();
 
-var screenSocket: WebSocket;
-var sockets: {'name': string, 'socket': WebSocket}[] = [];
+var sockets: Object = {}; //{'name': WebSocket}
 
 function getGameStatus(): object {
     let gameProps: object = {};
@@ -32,48 +31,42 @@ app.get('/', function (req, res) {
 
 wss.on('connection', function(socket: WebSocket) {
     let name: string = decodeURI(socket['upgradeReq'].url.substring(1));
-    if (undefined === screenSocket || socket === screenSocket) {
-        screenSocket = socket;
+    if (undefined === sockets['SCREEN'] || socket === sockets['SCREEN']) {
+        name = 'SCREEN';
         game.screenReady = true;
         sendMessage('screenConnected');
     } else {
         let player: Player = game.connect(name);
         name = player.name;
         sendMessage('playerConnected', player);
-        sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
+        sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
         if (game.gameReady) {
             broadcastMessage('gameReady', true);
         } else {
             broadcastMessage('gameReady', false);
         }
     }
-    sockets.push({
-        'name': name,
-        'socket': socket
-    });
+    sockets[name] = socket;
 
     socket.on('close', function() {
-        let name: string;
-        for (let s=0; s<sockets.length; ++s) {
-            if (sockets[s].socket === socket) {
-                name = sockets[s].name;
-                sockets.splice(s, 1);
+        let names = Object.keys(sockets);
+        for (var name in names) {
+            if (sockets[name] === socket) {
                 if (name === 'SCREEN') {
                     game.screenReady = false;
-                    screenSocket = undefined;
                 } else {
                     game.disconnect(name);
-                    sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
+                    sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
                     if (game.gameReady) {
                         broadcastMessage('gameReady', true);
                     } else {
                         broadcastMessage('gameReady', false);
                     }
                 }
+                delete sockets[name];
                 break;
             }
         }
-        console.log(name || 'an unknown socket', 'disconnected');
     });
 
     socket.on('message', (messageJSON: string) => {
@@ -95,20 +88,21 @@ wss.on('connection', function(socket: WebSocket) {
             case 'changeName':
                 let oldName: string = message.from;
                 let newName: string = message.data;
-                if (!game.playerExists(newName)) {
+                if (oldName !== newName && !game.playerExists(newName)) {
                     game.getPlayer(oldName).name = newName;
-                    for (let s=0; s<sockets.length; ++s) {
-                        if (sockets[s].name === oldName) {
-                            sockets[s].name = newName;
-                            break;
-                        }
-                    }
+                    sockets[newName] = sockets[oldName];
+                    delete sockets[oldName];
                 }
                 sendMessage('getPlayer', game.getPlayer(newName));
-                sendMessage('getGameStatus', getGameStatus(), [screenSocket]);
+                console.log(Object.keys(sockets))
+                sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
                 break;
             case 'startGame':
                 game.startGame();
+                if (game.gameStarted) {
+                    broadcastMessage('gameStarted', true);
+                    sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
+                }
                 break;
             default:
                 broadcastMessage('test');

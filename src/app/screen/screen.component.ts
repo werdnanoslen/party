@@ -17,6 +17,7 @@ export class ScreenComponent {
     public table: string;
     private players: any;
     private gameStatus: any;
+    private gameStarted: boolean;
 
     constructor(private messageService: MessageService) {
         this.gameMessage = "0 players connected";
@@ -32,6 +33,9 @@ export class ScreenComponent {
                     break;
                 case 'screenConnected':
                     console.log('the screen is ready');
+                    break;
+                case 'gameStarted':
+                    this.gameStarted = msg.data;
                     break;
                 default:
                     console.log('unhandled message: ', msg);

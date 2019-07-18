@@ -34,6 +34,9 @@ export class ControllerComponent {
                 case 'gameReady':
                     this.gameReady = msg.data;
                     break;
+                case 'gameStarted':
+                    this.gameStarted = msg.data;
+                    break;
                 default:
                     console.log('unhandled message: ', msg);
                     break;
