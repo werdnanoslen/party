@@ -26,10 +26,10 @@ export class ControllerComponent {
         this.messageService.subject.subscribe((msg: Message) => {
             switch (msg.command) {
                 case 'playerConnected':
-                    this.player = msg.data;
+                    this.updatePlayer(msg.data);
                     break;
                 case 'getPlayer':
-                    this.player = msg.data;
+                    this.updatePlayer(msg.data);
                     break;
                 case 'gameReady':
                     this.gameReady = msg.data;
@@ -42,6 +42,19 @@ export class ControllerComponent {
                     break;
             }
         });
+    }
+
+    private updatePlayer(playerData: any): void {
+        let keys = Object.keys(playerData);
+        let newPlayerObject = {};
+        for (var k=0; k<keys.length; ++k) {
+            let key = keys[k];
+            newPlayerObject[key] = playerData[key];
+        }
+        if (this.player === undefined) {
+            this.player = new Player;
+        }
+        Object.assign(this.player, newPlayerObject);
     }
 
     private changeName(form: any) {
