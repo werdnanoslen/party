@@ -41,9 +41,9 @@ wss.on('connection', function(socket: WebSocket) {
         sendMessage('playerConnected', player);
         sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
         if (game.gameReady) {
-            broadcastMessage('gameReady', true);
+            sendMessage('gameReady', true, Object.values(sockets));
         } else {
-            broadcastMessage('gameReady', false);
+            sendMessage('gameReady', false, Object.values(sockets));
         }
     }
     sockets[name] = socket;
@@ -58,9 +58,9 @@ wss.on('connection', function(socket: WebSocket) {
                     game.disconnect(name);
                     sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
                     if (game.gameReady) {
-                        broadcastMessage('gameReady', true);
+                        sendMessage('gameReady', true, Object.values(sockets));
                     } else {
-                        broadcastMessage('gameReady', false);
+                        sendMessage('gameReady', false, Object.values(sockets));
                     }
                 }
                 delete sockets[name];
@@ -75,7 +75,7 @@ wss.on('connection', function(socket: WebSocket) {
         switch (message.command) {
             case 'screenReady':
                 game.screenReady = true;
-                broadcastMessage('screenReady');
+                sendMessage('screenReady', undefined, Object.values(sockets));
                 break;
             case 'getPlayer':
                 let name: string = message.from;
@@ -94,18 +94,17 @@ wss.on('connection', function(socket: WebSocket) {
                     delete sockets[oldName];
                 }
                 sendMessage('getPlayer', game.getPlayer(newName));
-                console.log(Object.keys(sockets))
                 sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
                 break;
             case 'startGame':
                 game.startGame();
                 if (game.gameStarted) {
-                    broadcastMessage('gameStarted', true);
+                    sendMessage('gameStarted', true, Object.values(sockets));
                     sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
                 }
                 break;
             default:
-                broadcastMessage('test');
+                sendMessage('test', undefined, Object.values(sockets));
                 break;
         }
     });
@@ -124,16 +123,6 @@ wss.on('connection', function(socket: WebSocket) {
         } catch (error) {
             console.error('could not send message: ', error);
         }
-    }
-
-    function broadcastMessage(command: string, data?: any): void {
-        let message: Message = toMessage(command, data);
-        wss.clients.forEach(function each(client) {
-            if (client.readyState == WebSocket.OPEN) {
-                client.send(JSON.stringify(message));
-            }
-        });
-        console.log('broadcasted message: ', message);
     }
 
     function toMessage(command: string, data?: object): Message {
