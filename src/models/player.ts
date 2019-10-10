@@ -25,10 +25,4 @@ export class Player {
         // TODO
     }
 
-    public setName(name): void {
-        //TODO: check if name is already taken
-        console.log(this.name + " renamed to " + name);
-        this.name = name;
-    }
-
 }

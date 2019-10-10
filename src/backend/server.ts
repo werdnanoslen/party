@@ -103,6 +103,9 @@ wss.on('connection', function(socket: WebSocket) {
                     sendMessage('getGameStatus', getGameStatus(), [sockets['SCREEN']]);
                 }
                 break;
+            case 'playCard':
+                console.log(message.from, ': ', message.data);
+                break;
             default:
                 sendMessage('test', undefined, Object.values(sockets));
                 break;

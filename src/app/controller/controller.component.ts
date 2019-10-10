@@ -57,7 +57,7 @@ export class ControllerComponent {
         Object.assign(this.player, newPlayerObject);
     }
 
-    private changeName(form: any) {
+    private changeName(form: any): void {
         let newName:string = form.name;
         this.messageService.sendMessage('changeName', newName);
     }
@@ -67,7 +67,7 @@ export class ControllerComponent {
     }
 
     private playCard(card: Card): void {
-        this.player.playCard(card);
+        this.messageService.sendMessage('playCard', card)
     }
 
     private chooseCard(card: Card): void {

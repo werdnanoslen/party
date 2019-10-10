@@ -8,12 +8,12 @@
         <button id="gameStarter" (click)="startGame()" [class.hidden]='gameStarted || !gameReady'>Start Game</button>
     </div>
     <div id="hand" *ngIf="player !== undefined" [class.hidden]='!gameStarted'>
-        <div *ngFor="let card of player.cards"
+        <button *ngFor="let card of player.cards"
             (click)="playCard(card)"
             class="card"
             [class.black]="card.color === 'black'"
             [class.white]="card.color === 'white'">
             {{card.text}}
-        </div>
+        </button>
     </div>
 </ng-container>

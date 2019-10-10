@@ -6,7 +6,7 @@ import * as WHITE_CARD_CONTENTS from "../assets/cards/core_wcards.json";
 
 const HAND_SIZE: number = 5;
 const MAX_PLAYERS: number = 12;
-const MIN_PLAYERS: number = 3;
+const MIN_PLAYERS: number = 1;
 
 export class GameService {
     public players: Player[] = [];
@@ -36,9 +36,8 @@ export class GameService {
     public startGame(): void {
         let morePeopleNeeded = MIN_PLAYERS - this.players.length;
         if (morePeopleNeeded < 1) {
-            this.currentPlayer = this.players[0];
             this.gameStarted = true;
-            this.gameMessage = 'It\'s ' + this.currentPlayer.name + '\'s turn';
+            this.nextTurn();
         } else if (morePeopleNeeded === 1) {
             this.gameMessage = "Please nab at least one more horrible person."
         } else if (morePeopleNeeded > 1){
